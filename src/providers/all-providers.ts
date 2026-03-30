@@ -161,3 +161,52 @@ export class OpenAITTSProvider implements TTSProvider {
     return Buffer.from(await res.arrayBuffer());
   }
 }
+
+// --- Google Cloud TTS ---
+export class GoogleTTSProvider implements TTSProvider {
+  readonly name = 'Google Cloud TTS';
+  readonly description = 'Google Cloud TTS - 高品質な多言語TTS（無料枠あり: 月100万文字）';
+  readonly isFree = false;
+  private apiKey: string;
+  private defaultVoice: string;
+
+  constructor() {
+    this.apiKey = process.env.GOOGLE_TTS_API_KEY || '';
+    this.defaultVoice = process.env.GOOGLE_TTS_VOICE || 'ja-JP-Neural2-B';
+    if (!this.apiKey) throw new Error('GOOGLE_TTS_API_KEY が設定されていません');
+  }
+
+  async synthesize(options: SpeakOptions): Promise<Buffer> {
+    const voice = (options.speaker as string) || this.defaultVoice;
+    const res = await fetch(
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${this.apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: { text: options.text },
+          voice: { languageCode: 'ja-JP', name: voice },
+          audioConfig: {
+            audioEncoding: 'LINEAR16',
+            speakingRate: options.speed || 1.0,
+          },
+        }),
+      }
+    );
+    if (!res.ok) throw new Error(`Google TTS failed: ${res.status} ${await res.text()}`);
+    const data = await res.json() as { audioContent: string };
+    return Buffer.from(data.audioContent, 'base64');
+  }
+
+  async listSpeakers(): Promise<Array<{ id: string | number; name: string }>> {
+    const res = await fetch(
+      `https://texttospeech.googleapis.com/v1/voices?languageCode=ja-JP&key=${this.apiKey}`
+    );
+    if (!res.ok) throw new Error(`Google TTS voices failed: ${res.status}`);
+    const data = await res.json() as { voices: Array<{ name: string; ssmlGender: string }> };
+    return (data.voices || []).map((v) => ({
+      id: v.name,
+      name: `${v.name} (${v.ssmlGender})`,
+    }));
+  }
+}

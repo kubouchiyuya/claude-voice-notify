@@ -138,6 +138,7 @@ notify.sh status  # 現在の状態を確認
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #8131 | 3:15 PM | 🟣 | Voice notification toggle with persistent state for meeting-friendly muting | ~372 |
 | #8120 | 3:11 PM | 🟣 | Enhanced CLAUDE.md template with detailed notification guidelines and explanation mode | ~566 |
 | #8100 | 1:32 PM | 🟣 | Initial repository commit for multi-provider voice notification MCP server | ~393 |
 | #8093 | 1:24 PM | ✅ | Claude instruction template created for voice notification usage | ~275 |

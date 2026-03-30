@@ -7,6 +7,8 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #8135 | 3:19 PM | ✅ | Added Google Cloud TTS provider description metadata | ~273 |
+| #8134 | " | 🟣 | Google Cloud TTS provider integrated into provider registry | ~261 |
 | #8100 | 1:32 PM | 🟣 | Initial repository commit for multi-provider voice notification MCP server | ~393 |
 | #8089 | 1:24 PM | 🟣 | Multi-provider TTS architecture with 5 speech synthesis providers | ~407 |
 </claude-mem-context>

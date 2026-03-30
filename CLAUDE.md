@@ -1,14 +1,28 @@
 # claude-voice-notify
 
-## 音声通知コマンド
+## 音声コマンド
 
 ```bash
-/Users/kubouchiyuya/Projects/claude-voice-notify/notify.sh "メッセージ" [type] [speaker_id] [speed]
-```
+NOTIFY="/Users/kubouchiyuya/Projects/claude-voice-notify/notify.sh"
 
-- type: complete / confirm / error / explain
-- speaker_id: 1=ずんだもん(デフォルト), 3=ずんだもん(あまあま), 8=春日部つむぎ 等
-- speed: 読み上げ速度 (デフォルト1.0)
+# 読み上げ
+$NOTIFY "メッセージ"                          # デフォルトキャラで読み上げ
+$NOTIFY "メッセージ" complete 3 1.2           # タイプ/スピーカーID/速度指定
+
+# キャラ管理
+$NOTIFY list                                  # VOICEVOXキャラ一覧（★=現在）
+$NOTIFY set-speaker 8                         # デフォルトキャラ変更（例: 春日部つむぎ）
+$NOTIFY set-speed 1.2                         # デフォルト速度変更
+
+# プロバイダー切り替え
+$NOTIFY set-provider voicevox                 # VOICEVOX（デフォルト）
+$NOTIFY set-provider google                   # Google Cloud TTS
+$NOTIFY set-google-key <API_KEY>              # Google APIキー設定
+$NOTIFY set-google-voice ja-JP-Neural2-B      # Google音声名変更
+
+# オン/オフ
+$NOTIFY on / off / status
+```
 
 ## 音声通知ルール
 

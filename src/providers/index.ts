@@ -7,6 +7,7 @@ import {
   FishAudioProvider,
   ElevenLabsProvider,
   OpenAITTSProvider,
+  GoogleTTSProvider,
 } from './all-providers.js';
 
 const PROVIDER_MAP: Record<string, () => TTSProvider> = {
@@ -17,6 +18,7 @@ const PROVIDER_MAP: Record<string, () => TTSProvider> = {
   fish_audio: () => new FishAudioProvider(),
   elevenlabs: () => new ElevenLabsProvider(),
   openai: () => new OpenAITTSProvider(),
+  google: () => new GoogleTTSProvider(),
 };
 
 export function createProvider(name?: string): TTSProvider {
@@ -40,6 +42,7 @@ export function listAvailableProviders(): Array<{ name: string; description: str
         fish_audio: { desc: 'Fish Audio - 高品質クラウドTTS（有料）', free: false },
         elevenlabs: { desc: 'ElevenLabs - 英語最強クラウドTTS（有料/無料枠あり）', free: false },
         openai: { desc: 'OpenAI TTS - nova/alloy等（有料）', free: false },
+        google: { desc: 'Google Cloud TTS - 高品質多言語TTS（無料枠: 月100万文字）', free: false },
       };
       const info = descriptions[key] || { desc: key, free: false };
       return { name: key, description: info.desc, isFree: info.free };
