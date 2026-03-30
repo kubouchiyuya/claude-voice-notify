@@ -30,30 +30,43 @@ Claude Code がタスク完了・確認要求・エラー発生時に**音声で
 
 ---
 
-## 導入手順（10ステップ）
+## MCP ツール一覧
+
+| ツール名 | 用途 | デフォルトメッセージ |
+|---------|------|-------------------|
+| `notify_complete` | タスク完了通知 | 「タスクが完了しました」 |
+| `notify_confirm` | 確認要求通知 | 「確認をお願いします」 |
+| `notify_speak` | カスタム読み上げ | （text 必須） |
+| `notify_test` | 接続テスト | 「テスト成功」 |
+| `notify_list_providers` | プロバイダー一覧表示 | — |
+
+すべてのツールは `.voice-config` の設定（音量・速度・スピーカー）を自動的に反映します。
+
+---
+
+<details>
+<summary><strong>導入手順（10ステップ）</strong></summary>
 
 ### 方法 A: ワンコマンドセットアップ（推奨）
 
-> 💡 **どこにクローンすればいい？** お好きな場所で OK です。おすすめは:
+> お好きな場所にクローンしてください。おすすめ:
 > - macOS / Linux: `~/Projects/` または `~/dev/`
 > - Windows: `C:\Users\<ユーザー名>\Projects\`
->
-> 例: `cd ~/Projects && git clone ...`
 
 **macOS / Linux:**
 
 ```bash
-# ① Star する（必須） → https://github.com/kubouchiyuya/claude-voice-notify
-# ② 好きなディレクトリに移動（例: ~/Projects）
+# 1. Star する（必須） → https://github.com/kubouchiyuya/claude-voice-notify
+# 2. 好きなディレクトリに移動（例: ~/Projects）
 cd ~/Projects
 
-# ③ クローン
+# 3. クローン
 git clone https://github.com/kubouchiyuya/claude-voice-notify.git
 
-# ④ ディレクトリに入る
+# 4. ディレクトリに入る
 cd claude-voice-notify
 
-# ⑤ セットアップ実行（あとは全自動）
+# 5. セットアップ実行（あとは全自動）
 ./setup.sh
 ```
 
@@ -70,27 +83,27 @@ setup.bat
 
 | ステップ | 内容 |
 |---------|------|
-| ⑤-1 | GitHub Star の確認（ユーザー名を聞かれます） |
-| ⑤-2 | VOICEVOX の検出・インストール案内 |
-| ⑤-3 | `npm install` & `npm run build` |
-| ⑤-4 | プロバイダー選択（対話式で8種から選べる） |
-| ⑤-5 | キャラクター選択（性別・方言フィルター付き） |
-| ⑤-6 | VS Code 拡張機能の自動インストール |
-| ⑤-7 | Claude Code Hooks 設定ガイド表示 |
-| ⑤-8 | 音声テスト再生 |
+| 5-1 | GitHub Star の確認（ユーザー名を聞かれます） |
+| 5-2 | VOICEVOX の検出・インストール案内 |
+| 5-3 | `npm install` & `npm run build` |
+| 5-4 | プロバイダー選択（対話式で8種から選べる） |
+| 5-5 | キャラクター選択（性別・方言フィルター付き） |
+| 5-6 | VS Code 拡張機能の自動インストール |
+| 5-7 | Claude Code Hooks 設定ガイド表示 |
+| 5-8 | 音声テスト再生 |
 
 **セットアップ後にやること：**
 
 ```bash
-# ⑥ VOICEVOX を起動（まだの場合）
-# ⑦ Claude Code Hooks を ~/.claude/settings.json にコピペ（画面の指示に従う）
-# ⑧ テスト
+# 6. VOICEVOX を起動（まだの場合）
+# 7. Claude Code Hooks を ~/.claude/settings.json にコピペ（画面の指示に従う）
+# 8. テスト
 ./notify.sh "テスト成功"
 
-# ⑨ 設定パネルでカスタマイズ（キャラ・速度・音量・エンジン）
+# 9. 設定パネルでカスタマイズ（キャラ・速度・音量・エンジン）
 ./settings.sh
 
-# ⑩ 完了！Claude Code が音声で通知してくれます
+# 10. 完了！Claude Code が音声で通知してくれます
 ```
 
 ### 方法 B: 手動セットアップ
@@ -218,21 +231,58 @@ winget install Hiroshiba.VOICEVOX
 # → 「notify_test を実行して」
 ```
 
----
+</details>
 
-## MCP ツール一覧
+<details>
+<summary><strong>音量・速度・キャラクター設定</strong></summary>
 
-| ツール名 | 用途 | デフォルトメッセージ |
-|---------|------|-------------------|
-| `notify_complete` | タスク完了通知 | 「タスクが完了しました」 |
-| `notify_confirm` | 確認要求通知 | 「確認をお願いします」 |
-| `notify_speak` | カスタム読み上げ | （text 必須） |
-| `notify_test` | 接続テスト | 「テスト成功」 |
-| `notify_list_providers` | プロバイダー一覧表示 | — |
+### 音量・速度調整
 
----
+```bash
+# 音量調整（0.0〜1.0、デフォルト: 1.0）
+./notify.sh set-volume 0.5    # 半分の音量
+./notify.sh set-volume 0.3    # 控えめ（会議中のお隣さん対策）
+./notify.sh set-volume 1.0    # 最大音量
 
-## 環境変数リファレンス
+# 速度調整（0.5〜2.0、デフォルト: 1.0）
+./notify.sh set-speed 1.2     # やや速め
+./notify.sh set-speed 0.8     # ゆっくり
+
+# 設定パネル（GUIライクな対話式メニュー）
+./settings.sh
+```
+
+### キャラクター管理
+
+```bash
+# 一覧表示（★ = 現在のデフォルト）
+./notify.sh list
+
+# デフォルトキャラを変更
+./notify.sh set-speaker 8    # 春日部つむぎ
+
+# 一時的に別キャラで喋らせる（デフォルトは変えない）
+./notify.sh "メッセージ" complete 8
+```
+
+### VOICEVOX キャラクター一覧（主要）
+
+| ID | キャラクター | ID | キャラクター |
+|----|-----------|----|-----------|
+| 3 | ずんだもん（ノーマル） | 1 | ずんだもん（あまあま） |
+| 7 | ずんだもん（ツンツン） | 5 | ずんだもん（セクシー） |
+| 22 | ずんだもん（ささやき） | 8 | 春日部つむぎ |
+| 2 | 四国めたん（ノーマル） | 0 | 四国めたん（あまあま） |
+| 10 | 雨晴はう | 9 | 波音リツ |
+| 13 | 青山龍星 | 14 | 冥鳴ひまり |
+| 20 | もち子さん | 46 | 小夜/SAYO |
+
+100+ キャラクターが利用可能。`./notify.sh list` で全一覧を確認できます。
+
+</details>
+
+<details>
+<summary><strong>環境変数リファレンス</strong></summary>
 
 ### 共通
 
@@ -272,82 +322,36 @@ winget install Hiroshiba.VOICEVOX
 
 | 変数 | 説明 | 必須 |
 |------|------|------|
-| `FISH_AUDIO_API_KEY` | API キー | ✅ |
+| `FISH_AUDIO_API_KEY` | API キー | はい |
 | `FISH_AUDIO_VOICE_ID` | ボイス ID | 推奨 |
 
 ### ElevenLabs
 
 | 変数 | 説明 | 必須 |
 |------|------|------|
-| `ELEVENLABS_API_KEY` | API キー | ✅ |
+| `ELEVENLABS_API_KEY` | API キー | はい |
 | `ELEVENLABS_VOICE_ID` | ボイス ID | — (デフォルト: Rachel) |
 
 ### OpenAI TTS
 
 | 変数 | 説明 | 必須 |
 |------|------|------|
-| `OPENAI_API_KEY` | API キー | ✅ |
+| `OPENAI_API_KEY` | API キー | はい |
 | `OPENAI_TTS_VOICE` | ボイス名 | — (デフォルト: nova) |
 
 ### Google Cloud TTS
 
 | 変数 | 説明 | 必須 |
 |------|------|------|
-| `GOOGLE_TTS_API_KEY` | API キー | ✅ |
+| `GOOGLE_TTS_API_KEY` | API キー | はい |
 | `GOOGLE_TTS_VOICE` | 音声名 | — (デフォルト: ja-JP-Neural2-B) |
 
 Google Cloud TTS は月100万文字まで無料。`./notify.sh set-provider google` で切り替え。
 
----
+</details>
 
-## 音量・速度調整
-
-```bash
-# 音量調整（0.0〜1.0、デフォルト: 1.0）
-./notify.sh set-volume 0.5    # 半分の音量
-./notify.sh set-volume 0.3    # 控えめ（会議中のお隣さん対策）
-./notify.sh set-volume 1.0    # 最大音量
-
-# 速度調整（0.5〜2.0、デフォルト: 1.0）
-./notify.sh set-speed 1.2     # やや速め
-./notify.sh set-speed 0.8     # ゆっくり
-
-# 設定パネル（GUIライクな対話式メニュー）
-./settings.sh
-```
-
----
-
-## キャラクター管理
-
-```bash
-# 一覧表示（★ = 現在のデフォルト）
-./notify.sh list
-
-# デフォルトキャラを変更
-./notify.sh set-speaker 8    # 春日部つむぎ
-
-# 一時的に別キャラで喋らせる（デフォルトは変えない）
-./notify.sh "メッセージ" complete 8
-```
-
-### VOICEVOX キャラクター一覧（主要）
-
-| ID | キャラクター | ID | キャラクター |
-|----|-----------|----|-----------|
-| 3 | ずんだもん（ノーマル） | 1 | ずんだもん（あまあま） |
-| 7 | ずんだもん（ツンツン） | 5 | ずんだもん（セクシー） |
-| 22 | ずんだもん（ささやき） | 8 | 春日部つむぎ |
-| 2 | 四国めたん（ノーマル） | 0 | 四国めたん（あまあま） |
-| 10 | 雨晴はう | 9 | 波音リツ |
-| 13 | 青山龍星 | 14 | 冥鳴ひまり |
-| 20 | もち子さん | 46 | 小夜/SAYO |
-
-100+ キャラクターが利用可能。`./notify.sh list` で全一覧を確認できます。
-
----
-
-## 自分の声を使う（Style-Bert-VITS2）
+<details>
+<summary><strong>自分の声を使う（Style-Bert-VITS2）</strong></summary>
 
 1. [Style-Bert-VITS2](https://github.com/litagin02/Style-Bert-VITS2) をセットアップ
 2. 自分の音声データで学習
@@ -364,16 +368,18 @@ Google Cloud TTS は月100万文字まで無料。`./notify.sh set-provider goog
 
 Udemy や動画制作で使った自分の声をそのまま通知音声にすることもできます。
 
----
+</details>
 
-## CLAUDE.md への組み込み
+<details>
+<summary><strong>CLAUDE.md への組み込み</strong></summary>
 
 プロジェクトの `CLAUDE.md` に以下を追加すると、Claude Code が自動的に音声通知を使うようになります。
 [templates/CLAUDE.md](templates/CLAUDE.md) を参照してください。
 
----
+</details>
 
-## アップデート
+<details>
+<summary><strong>アップデート</strong></summary>
 
 クローンした人はワンコマンドで最新版に更新できます：
 
@@ -384,11 +390,10 @@ Udemy や動画制作で使った自分の声をそのまま通知音声にす�
 - 更新内容を確認 → 確認後に `git pull` & `npm run build` を自動実行
 - リリース通知を受け取るには、リポジトリを **Watch > Releases only** に設定してください
 
----
+</details>
 
-## ディレクトリ構成
-
-クローン後のディレクトリはこのようになっています：
+<details>
+<summary><strong>ディレクトリ構成</strong></summary>
 
 ```
 claude-voice-notify/
@@ -414,9 +419,10 @@ claude-voice-notify/
 - Git にはコミットされません（`.gitignore` 済み）
 - 手動で編集も可能（key=value 形式）
 
----
+</details>
 
-## トラブルシューティング
+<details>
+<summary><strong>トラブルシューティング</strong></summary>
 
 | 症状 | 原因 | 対処 |
 |------|------|------|
@@ -424,6 +430,37 @@ claude-voice-notify/
 | 音声が鳴らない（macOS） | afplay の問題 | `afplay /tmp/test.wav` で確認 |
 | 音声が鳴らない（Windows） | WMP の問題 | PowerShell で手動テスト |
 | ビルドエラー | node_modules がない | `npm install` を実行 |
+| 設定が反映されない（MCP） | サーバー未再起動 | VS Code: Cmd+Shift+P → Developer: Reload Window |
+
+</details>
+
+---
+
+## 免責事項・法的注意事項
+
+### 音声合成に関する重要事項
+
+本ソフトウェアは音声合成エンジンを利用して音声を生成します。音声合成の利用にあたっては、以下の点にご注意ください。
+
+1. **各音声合成エンジンの利用規約を遵守してください。** 本ソフトウェアが対応する各プロバイダー（VOICEVOX、COEIROINK、AivisSpeech、Style-Bert-VITS2、Google Cloud TTS、Fish Audio、ElevenLabs、OpenAI TTS）には、それぞれ独自の利用規約・ライセンスがあります。ユーザーは使用するプロバイダーの規約を確認し、遵守する責任を負います。
+
+2. **キャラクターの音声には著作権・利用条件があります。** VOICEVOX や COEIROINK 等のキャラクター音声は、各キャラクターの権利者が定めるガイドラインに従って使用する必要があります。商用利用・配信・公開等を行う場合は、必ず各キャラクターの利用規約をご確認ください。
+
+3. **音声クローン技術の利用について。** Style-Bert-VITS2、Fish Audio 等の音声クローン技術を使用する場合、他者の声を無断で複製・使用することは、肖像権・パブリシティ権・著作権等の侵害となる可能性があります。音声クローンは必ず本人の同意を得た上で、または自分自身の声のみで使用してください。
+
+4. **生成された音声コンテンツの責任。** 本ソフトウェアを使用して生成された音声コンテンツに関する一切の責任は、ユーザーが負うものとします。生成物を公開・配信・商用利用する場合は、適用される法律（著作権法、不正競争防止法、個人情報保護法等）を遵守してください。
+
+### 免責条項
+
+本ソフトウェアは「現状のまま（AS IS）」で提供されます。作者および貢献者は、本ソフトウェアの使用に起因する**いかなる損害（直接的・間接的・偶発的・特別・結果的損害を含む）についても一切の責任を負いません**。これには以下が含まれますが、これに限定されません：
+
+- 音声合成エンジンの利用規約違反に起因する損害
+- 著作権・肖像権・パブリシティ権その他の権利侵害に起因する損害
+- 音声データの不正使用・漏洩に起因する損害
+- 第三者の知的財産権の侵害に起因する損害
+- 本ソフトウェアの不具合・動作不良に起因する損害
+
+ユーザーは、本ソフトウェアの使用が適用される全ての法令に準拠していることを自ら確認する責任を負います。
 
 ---
 

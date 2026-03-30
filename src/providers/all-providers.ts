@@ -22,6 +22,9 @@ export class AivisSpeechProvider implements TTSProvider {
     if (!queryRes.ok) throw new Error(`AivisSpeech audio_query failed: ${queryRes.status}`);
     const query = await queryRes.json() as Record<string, unknown>;
     query.speedScale = options.speed || 1.0;
+    if (options.volume !== undefined) {
+      query.volumeScale = options.volume;
+    }
 
     const synthRes = await fetch(`${this.baseUrl}/synthesis?speaker=${speaker}`, {
       method: 'POST',

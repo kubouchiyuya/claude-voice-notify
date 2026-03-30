@@ -6,14 +6,79 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { createProvider, listAvailableProviders } from './providers/index.js';
 import { playAudio } from './provider-base.js';
 import type { TTSProvider, NotificationType } from './types.js';
 
+// --- .voice-config 読み込み ---
+interface VoiceConfig {
+  speaker: number | string;
+  speed: number;
+  volume: number;
+  provider: string;
+}
+
+function loadVoiceConfig(): VoiceConfig {
+  const defaults: VoiceConfig = {
+    speaker: parseInt(process.env.VOICEVOX_SPEAKER || '3', 10),
+    speed: 1.0,
+    volume: 1.0,
+    provider: process.env.NOTIFY_PROVIDER || 'voicevox',
+  };
+
+  // プロジェクトルートの .voice-config を探す
+  const configPaths = [
+    join(__dirname, '..', '.voice-config'),       // dist/../.voice-config
+    join(__dirname, '..', '..', '.voice-config'),  // src/../.voice-config（開発時）
+  ];
+
+  for (const configPath of configPaths) {
+    try {
+      const content = readFileSync(configPath, 'utf-8');
+      for (const line of content.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx === -1) continue;
+        const key = trimmed.slice(0, eqIdx).trim();
+        const value = trimmed.slice(eqIdx + 1).trim();
+        switch (key) {
+          case 'DEFAULT_SPEAKER':
+            defaults.speaker = /^\d+$/.test(value) ? parseInt(value, 10) : value;
+            break;
+          case 'DEFAULT_SPEED':
+            defaults.speed = parseFloat(value) || 1.0;
+            break;
+          case 'DEFAULT_VOLUME':
+            defaults.volume = parseFloat(value) || 1.0;
+            break;
+          case 'DEFAULT_PROVIDER':
+            defaults.provider = value;
+            break;
+        }
+      }
+      console.error(`[claude-voice-notify] 設定読み込み: ${configPath}`);
+      break;
+    } catch {
+      // ファイルが見つからない場合は次を試す
+    }
+  }
+
+  return defaults;
+}
+
+// 設定を毎回読み直す（リアルタイム反映）
+function getConfig(): VoiceConfig {
+  return loadVoiceConfig();
+}
+
 let provider: TTSProvider;
 
 try {
-  provider = createProvider();
+  const initialConfig = getConfig();
+  provider = createProvider(initialConfig.provider);
 } catch (e) {
   console.error(`[claude-voice-notify] プロバイダー初期化エラー: ${e}`);
   process.exit(1);
@@ -102,20 +167,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case 'notify_complete': {
+        const config = getConfig();
         const message = (args?.message as string) || DEFAULT_MESSAGES.complete;
-        const audio = await provider.synthesize({ text: message, type: 'complete' });
-        await playAudio(audio);
+        const audio = await provider.synthesize({
+          text: message,
+          type: 'complete',
+          speed: config.speed,
+          volume: config.volume,
+          speaker: config.speaker,
+        });
+        await playAudio(audio, config.volume);
         return { content: [{ type: 'text', text: `✅ 完了通知: "${message}"` }] };
       }
 
       case 'notify_confirm': {
+        const config = getConfig();
         const message = (args?.message as string) || DEFAULT_MESSAGES.confirm;
-        const audio = await provider.synthesize({ text: message, type: 'confirm' });
-        await playAudio(audio);
+        const audio = await provider.synthesize({
+          text: message,
+          type: 'confirm',
+          speed: config.speed,
+          volume: config.volume,
+          speaker: config.speaker,
+        });
+        await playAudio(audio, config.volume);
         return { content: [{ type: 'text', text: `❓ 確認通知: "${message}"` }] };
       }
 
       case 'notify_speak': {
+        const config = getConfig();
         const text = args?.text as string;
         if (!text) {
           return { content: [{ type: 'text', text: 'エラー: text パラメータが必要です' }], isError: true };
@@ -123,23 +203,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const audio = await provider.synthesize({
           text,
           type: (args?.type as NotificationType) || 'custom',
-          speed: args?.speed as number | undefined,
-          speaker: args?.speaker as number | string | undefined,
+          speed: (args?.speed as number | undefined) ?? config.speed,
+          volume: (args?.volume as number | undefined) ?? config.volume,
+          speaker: (args?.speaker as number | string | undefined) ?? config.speaker,
         });
-        await playAudio(audio, args?.volume as number | undefined);
+        await playAudio(audio, (args?.volume as number | undefined) ?? config.volume);
         return { content: [{ type: 'text', text: `🔊 読み上げ: "${text}"` }] };
       }
 
       case 'notify_test': {
+        const config = getConfig();
         const audio = await provider.synthesize({
           text: 'テスト成功。音声通知が正常に動作しています。',
           type: 'info',
+          speed: config.speed,
+          volume: config.volume,
+          speaker: config.speaker,
         });
-        await playAudio(audio);
+        await playAudio(audio, config.volume);
         return {
           content: [{
             type: 'text',
-            text: `✅ テスト成功\nプロバイダー: ${provider.name}\n${provider.description}`,
+            text: `✅ テスト成功\nプロバイダー: ${provider.name}\n${provider.description}\n速度: ${config.speed} / 音量: ${config.volume} / スピーカー: ${config.speaker}`,
           }],
         };
       }

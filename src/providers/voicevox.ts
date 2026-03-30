@@ -39,8 +39,11 @@ export class VoicevoxProvider implements TTSProvider {
     }
     const query = await queryRes.json() as Record<string, unknown>;
 
-    // Apply speed
+    // Apply speed and volume
     query.speedScale = speed;
+    if (options.volume !== undefined) {
+      query.volumeScale = options.volume;
+    }
 
     // Step 2: synthesis
     const synthRes = await fetch(
