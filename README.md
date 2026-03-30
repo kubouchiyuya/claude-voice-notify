@@ -26,24 +26,84 @@ Claude Code がタスク完了・確認要求・エラー発生時に**音声で
 
 ---
 
-## 導入手順（5 分）
+## 導入手順
 
-### 1. VOICEVOX をインストール（無料プロバイダーの場合）
-
-[VOICEVOX 公式サイト](https://voicevox.hiroshiba.jp/) からダウンロード・起動するだけ。API キー不要。
-
-### 2. リポジトリを clone してビルド
+### 方法 A: ワンコマンドセットアップ（推奨）
 
 ```bash
-git clone https://github.com/Masa_AIcreater/claude-voice-notify.git
+git clone https://github.com/kubouchiyuya/claude-voice-notify.git
+cd claude-voice-notify
+./setup.sh
+```
+
+セットアップスクリプトが以下を自動で行います：
+- VOICEVOX の検出・インストール案内（Homebrew or 公式サイト）
+- `npm install` & `npm run build`
+- Claude Code Hooks の設定ガイド
+- 音声テスト
+
+**VOICEVOX がなくても動きます** — macOS の `say` コマンド（Kyoko）に自動フォールバックします。
+後から VOICEVOX をインストール・起動すれば、自動的にずんだもんの声に切り替わります。
+
+### 方法 B: 手動セットアップ
+
+#### 1. リポジトリを clone してビルド
+
+```bash
+git clone https://github.com/kubouchiyuya/claude-voice-notify.git
 cd claude-voice-notify
 npm install
 npm run build
 ```
 
-### 3. Claude Code の設定に追加
+#### 2. VOICEVOX をインストール（任意）
 
-`~/.claude.json` に以下を追加：
+```bash
+# Homebrew
+brew install --cask voicevox
+
+# または公式サイトからダウンロード
+# https://voicevox.hiroshiba.jp/
+```
+
+インストールしなくても macOS `say`（Kyoko）で動作します。
+
+### 3. Claude Code Hooks を設定（再起動不要）
+
+`~/.claude/settings.json` の `hooks` に追加：
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/path/to/claude-voice-notify/notify.sh 'タスクが完了しました' complete"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/path/to/claude-voice-notify/notify.sh '確認をお願いします' confirm"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 4. (任意) MCP サーバーも追加
+
+`~/.claude.json` の `mcpServers` に追加すると、Claude が状況に応じたカスタムメッセージを読み上げられます：
 
 ```json
 {
@@ -60,11 +120,15 @@ npm run build
 }
 ```
 
-### 4. VS Code を再起動
-
 ### 5. テスト
 
-Claude Code で「`notify_test` を実行して」と伝えて、ずんだもんの声が聞こえれば成功！
+```bash
+# 直接テスト（即実行）
+./notify.sh "テスト成功"
+
+# Claude Code 経由（MCP設定後）
+# → 「notify_test を実行して」
+```
 
 ---
 

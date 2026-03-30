@@ -1,3 +1,20 @@
+# claude-voice-notify
+
+## 音声通知ルール
+
+このプロジェクトでは `voice-notify` MCPサーバーによる音声通知が有効です。
+
+### 必ず守ること
+
+1. **タスク完了時** → `mcp__voice-notify__notify_complete` を呼ぶ
+2. **ユーザーへの確認が必要な時** → `mcp__voice-notify__notify_confirm` を呼ぶ
+3. **エラー発生時** → `mcp__voice-notify__notify_speak` で type="error" を指定して呼ぶ
+
+### プロバイダー
+
+- デフォルト: VOICEVOX（ずんだもん / Speaker ID: 1）
+- VOICEVOX が `http://localhost:50021` で起動している必要がある
+
 <claude-mem-context>
 # Recent Activity
 

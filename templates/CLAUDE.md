@@ -32,5 +32,6 @@ notify_speak(text="ビルドに失敗しました。エラー内容を確認し�
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #8100 | 1:32 PM | 🟣 | Initial repository commit for multi-provider voice notification MCP server | ~393 |
 | #8093 | 1:24 PM | ✅ | Claude instruction template created for voice notification usage | ~275 |
 </claude-mem-context>
