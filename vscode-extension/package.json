@@ -29,6 +29,10 @@
         "title": "Claude Voice: ⏩ 速度調整"
       },
       {
+        "command": "claude-voice.adjustVolume",
+        "title": "Claude Voice: 🔉 音量調整"
+      },
+      {
         "command": "claude-voice.testPlay",
         "title": "Claude Voice: 🔊 テスト再生"
       }

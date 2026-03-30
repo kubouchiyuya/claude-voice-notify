@@ -50,11 +50,14 @@ export function activate(context: vscode.ExtensionContext) {
       const provider = getConfigValue('DEFAULT_PROVIDER', 'voicevox');
       const voiceState = isVoiceOff() ? '🔇 OFF' : '🔊 ON';
 
+      const volume = getConfigValue('DEFAULT_VOLUME', '1.0');
+
       const items: vscode.QuickPickItem[] = [
         { label: `${voiceState}`, description: 'クリックで切り替え', detail: '音声通知の ON/OFF' },
         { label: '$(separator)', kind: vscode.QuickPickItemKind.Separator } as any,
         { label: `🎤 キャラ: ${charName}`, description: 'キャラクター変更', detail: 'VOICEVOX のキャラクターを変更' },
         { label: `⏩ 速度: ${speed}x`, description: '速度調整', detail: '読み上げ速度を変更' },
+        { label: `🔉 音量: ${volume}`, description: '音量調整', detail: '読み上げ音量を変更 (0.0〜1.0)' },
         { label: `🗾 方言で選ぶ`, description: '方言・地域選択', detail: '東北弁・九州弁などから選ぶ' },
         { label: `🔧 エンジン: ${provider}`, description: 'エンジン変更', detail: '音声エンジンを切り替え' },
         { label: '$(separator)', kind: vscode.QuickPickItemKind.Separator } as any,
@@ -74,6 +77,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.executeCommand('claude-voice.selectCharacter');
       } else if (selected.label.includes('速度')) {
         vscode.commands.executeCommand('claude-voice.adjustSpeed');
+      } else if (selected.label.includes('音量')) {
+        vscode.commands.executeCommand('claude-voice.adjustVolume');
       } else if (selected.label.includes('方言')) {
         selectDialect();
       } else if (selected.label.includes('エンジン')) {
@@ -141,6 +146,36 @@ export function activate(context: vscode.ExtensionContext) {
         runNotify(`set-speed ${(selected as any).speed}`);
         runNotifyAsync(`"この速度はどうですか？" complete`);
         vscode.window.showInformationMessage(`速度変更: ${(selected as any).speed}x`);
+      }
+    })
+  );
+
+  // 音量調整
+  context.subscriptions.push(
+    vscode.commands.registerCommand('claude-voice.adjustVolume', async () => {
+      const currentVolume = getConfigValue('DEFAULT_VOLUME', '1.0');
+      const volumes = ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0'];
+
+      const items = volumes.map(v => {
+        const filled = Math.round(parseFloat(v) * 20);
+        const bar = '█'.repeat(filled);
+        const empty = '░'.repeat(20 - filled);
+        const marker = v === currentVolume ? ' ← 現在' : '';
+        return {
+          label: `${v}  ${bar}${empty}${marker}`,
+          volume: v,
+        };
+      });
+
+      const selected = await vscode.window.showQuickPick(items, {
+        title: '🔉 音量調整',
+        placeHolder: `現在: ${currentVolume}`,
+      });
+
+      if (selected) {
+        runNotify(`set-volume ${(selected as any).volume}`);
+        runNotifyAsync(`"この音量はどうですか？" complete`);
+        vscode.window.showInformationMessage(`音量変更: ${(selected as any).volume}`);
       }
     })
   );
