@@ -40,13 +40,47 @@ const child_process_1 = require("child_process");
 const fs_1 = require("fs");
 const os_1 = require("os");
 const path_1 = require("path");
-const NOTIFY_DIR = (0, path_1.join)((0, os_1.homedir)(), 'Projects', 'claude-voice-notify');
-const NOTIFY_SH = (0, path_1.join)(NOTIFY_DIR, 'notify.sh');
-const STATE_FILE = (0, path_1.join)(NOTIFY_DIR, '.voice-enabled');
-const CONFIG_FILE = (0, path_1.join)(NOTIFY_DIR, '.voice-config');
+// ── バックエンド候補パス ──
+const BACKENDS = {
+    plugin: (0, path_1.join)((0, os_1.homedir)(), '.claude', 'plugins', 'voice-notify', 'scripts'),
+    mcp: (0, path_1.join)((0, os_1.homedir)(), 'Projects', 'claude-voice-notify'),
+};
+let activeBackend = 'plugin';
 let statusBarToggle;
 let statusBarSettings;
+function getNotifyDir() {
+    return BACKENDS[activeBackend];
+}
+function getNotifySh() {
+    return (0, path_1.join)(getNotifyDir(), 'notify.sh');
+}
+function getStateFile() {
+    return (0, path_1.join)(getNotifyDir(), '.voice-enabled');
+}
+function getConfigFile() {
+    return (0, path_1.join)(getNotifyDir(), '.voice-config');
+}
+function detectBackend() {
+    // Plugin版を優先検出
+    if ((0, fs_1.existsSync)((0, path_1.join)(BACKENDS.plugin, 'notify.sh'))) {
+        return 'plugin';
+    }
+    if ((0, fs_1.existsSync)((0, path_1.join)(BACKENDS.mcp, 'notify.sh'))) {
+        return 'mcp';
+    }
+    return 'plugin'; // デフォルト
+}
+function getAvailableBackends() {
+    const available = [];
+    if ((0, fs_1.existsSync)((0, path_1.join)(BACKENDS.plugin, 'notify.sh')))
+        available.push('plugin');
+    if ((0, fs_1.existsSync)((0, path_1.join)(BACKENDS.mcp, 'notify.sh')))
+        available.push('mcp');
+    return available;
+}
 function activate(context) {
+    // バックエンド自動検出
+    activeBackend = detectBackend();
     // ── ステータスバー: ON/OFF トグル ──
     statusBarToggle = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     statusBarToggle.command = 'claude-voice.toggleOnOff';
@@ -70,10 +104,12 @@ function activate(context) {
     // 設定パネル（クイックピック）
     context.subscriptions.push(vscode.commands.registerCommand('claude-voice.openSettings', async () => {
         const charName = getCharacterName();
-        const speed = getConfigValue('DEFAULT_SPEED', '1.0');
+        const speed = getConfigValue('DEFAULT_SPEED', '1.3');
         const provider = getConfigValue('DEFAULT_PROVIDER', 'voicevox');
         const voiceState = isVoiceOff() ? '🔇 OFF' : '🔊 ON';
-        const volume = getConfigValue('DEFAULT_VOLUME', '1.0');
+        const volume = getConfigValue('DEFAULT_VOLUME', '0.3');
+        const backends = getAvailableBackends();
+        const backendLabel = activeBackend === 'plugin' ? 'Plugin版' : 'MCP版';
         const items = [
             { label: `${voiceState}`, description: 'クリックで切り替え', detail: '音声通知の ON/OFF' },
             { label: '$(separator)', kind: vscode.QuickPickItemKind.Separator },
@@ -85,6 +121,10 @@ function activate(context) {
             { label: '$(separator)', kind: vscode.QuickPickItemKind.Separator },
             { label: '🔊 テスト再生', description: '現在の設定でテスト', detail: '' },
         ];
+        // 両方インストール済みの場合のみ切り替えオプション表示
+        if (backends.length > 1) {
+            items.push({ label: '$(separator)', kind: vscode.QuickPickItemKind.Separator }, { label: `🔄 バックエンド: ${backendLabel}`, description: '切り替え', detail: `現在: ${backendLabel} (${getNotifyDir()})` });
+        }
         const selected = await vscode.window.showQuickPick(items, {
             title: '⚙️ VB 設定パネル',
             placeHolder: '設定を選択してください',
@@ -112,6 +152,36 @@ function activate(context) {
         else if (selected.label.includes('テスト')) {
             vscode.commands.executeCommand('claude-voice.testPlay');
         }
+        else if (selected.label.includes('バックエンド')) {
+            vscode.commands.executeCommand('claude-voice.switchBackend');
+        }
+    }));
+    // バックエンド切り替え
+    context.subscriptions.push(vscode.commands.registerCommand('claude-voice.switchBackend', async () => {
+        const backends = getAvailableBackends();
+        if (backends.length < 2) {
+            vscode.window.showInformationMessage(`利用可能なバックエンドは ${activeBackend === 'plugin' ? 'Plugin版' : 'MCP版'} のみです`);
+            return;
+        }
+        const items = backends.map(b => ({
+            label: b === 'plugin' ? 'Plugin版 (コンテキスト節約)' : 'MCP版 (フル機能)',
+            description: b === activeBackend ? '← 現在' : '',
+            detail: BACKENDS[b],
+            backend: b,
+        }));
+        const selected = await vscode.window.showQuickPick(items, {
+            title: '🔄 バックエンド切り替え',
+            placeHolder: '使用するバックエンドを選択',
+        });
+        if (selected && selected.backend !== activeBackend) {
+            activeBackend = selected.backend;
+            // .active-backendファイルに書き込み（hooks排他制御用）
+            persistBackendChoice(activeBackend);
+            updateToggleStatus();
+            const label = activeBackend === 'plugin' ? 'Plugin版' : 'MCP版';
+            vscode.window.showInformationMessage(`バックエンド切り替え: ${label}`);
+            runNotifyAsync('"バックエンドを切り替えました" complete');
+        }
     }));
     // キャラクター選択
     context.subscriptions.push(vscode.commands.registerCommand('claude-voice.selectCharacter', async () => {
@@ -135,18 +205,18 @@ function activate(context) {
         if (selected) {
             runNotify(`set-speaker ${selected.id}`);
             updateToggleStatus();
-            runNotifyAsync(`"キャラクターを変更しました！" complete`);
+            runNotifyAsync('"キャラクターを変更しました！" complete');
             vscode.window.showInformationMessage(`キャラ変更: ${selected.label}`);
         }
     }));
     // 速度調整
     context.subscriptions.push(vscode.commands.registerCommand('claude-voice.adjustSpeed', async () => {
-        const currentSpeed = getConfigValue('DEFAULT_SPEED', '1.0');
+        const currentSpeed = getConfigValue('DEFAULT_SPEED', '1.3');
         const speeds = ['0.5', '0.7', '0.8', '0.9', '1.0', '1.1', '1.2', '1.3', '1.5', '1.8', '2.0'];
         const items = speeds.map(s => {
-            const bar = '█'.repeat(Math.round((parseFloat(s) - 0.5) / 1.5 * 20));
-            const empty = '░'.repeat(20 - bar.length);
-            const marker = s === currentSpeed ? ' ← 現在' : '';
+            const bar = '\u2588'.repeat(Math.round((parseFloat(s) - 0.5) / 1.5 * 20));
+            const empty = '\u2591'.repeat(20 - bar.length);
+            const marker = s === currentSpeed ? ' \u2190 現在' : '';
             return {
                 label: `${s}x  ${bar}${empty}${marker}`,
                 speed: s,
@@ -158,19 +228,19 @@ function activate(context) {
         });
         if (selected) {
             runNotify(`set-speed ${selected.speed}`);
-            runNotifyAsync(`"この速度はどうですか？" complete`);
+            runNotifyAsync('"この速度はどうですか？" complete');
             vscode.window.showInformationMessage(`速度変更: ${selected.speed}x`);
         }
     }));
     // 音量調整
     context.subscriptions.push(vscode.commands.registerCommand('claude-voice.adjustVolume', async () => {
-        const currentVolume = getConfigValue('DEFAULT_VOLUME', '1.0');
+        const currentVolume = getConfigValue('DEFAULT_VOLUME', '0.3');
         const volumes = ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0'];
         const items = volumes.map(v => {
             const filled = Math.round(parseFloat(v) * 20);
-            const bar = '█'.repeat(filled);
-            const empty = '░'.repeat(20 - filled);
-            const marker = v === currentVolume ? ' ← 現在' : '';
+            const bar = '\u2588'.repeat(filled);
+            const empty = '\u2591'.repeat(20 - filled);
+            const marker = v === currentVolume ? ' \u2190 現在' : '';
             return {
                 label: `${v}  ${bar}${empty}${marker}`,
                 volume: v,
@@ -182,13 +252,13 @@ function activate(context) {
         });
         if (selected) {
             runNotify(`set-volume ${selected.volume}`);
-            runNotifyAsync(`"この音量はどうですか？" complete`);
+            runNotifyAsync('"この音量はどうですか？" complete');
             vscode.window.showInformationMessage(`音量変更: ${selected.volume}`);
         }
     }));
     // テスト再生
     context.subscriptions.push(vscode.commands.registerCommand('claude-voice.testPlay', () => {
-        runNotifyAsync(`"テスト再生です。この声とスピードで通知されます" complete`);
+        runNotifyAsync('"テスト再生です。この声とスピードで通知されます" complete');
     }));
     // 定期的にステータスバーを更新
     setInterval(updateToggleStatus, 5000);
@@ -197,38 +267,66 @@ function activate(context) {
 // ── ヘルパー関数 ──
 function isVoiceOff() {
     try {
-        if ((0, fs_1.existsSync)(STATE_FILE)) {
-            return (0, fs_1.readFileSync)(STATE_FILE, 'utf8').trim() === '0';
+        const stateFile = getStateFile();
+        if ((0, fs_1.existsSync)(stateFile)) {
+            return (0, fs_1.readFileSync)(stateFile, 'utf8').trim() === '0';
         }
     }
     catch { }
     return false;
 }
 function updateToggleStatus() {
+    const backendTag = activeBackend === 'plugin' ? 'P' : 'M';
     if (isVoiceOff()) {
-        statusBarToggle.text = '$(mute) Voice OFF';
+        statusBarToggle.text = `$(mute) Voice OFF [${backendTag}]`;
         statusBarToggle.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
     }
     else {
-        statusBarToggle.text = '$(unmute) Voice ON';
+        statusBarToggle.text = `$(unmute) Voice ON [${backendTag}]`;
         statusBarToggle.backgroundColor = undefined;
     }
 }
+function persistBackendChoice(backend) {
+    // Plugin版の.active-backendファイルに書き込み（hooks排他制御用）
+    const pluginScriptsDir = BACKENDS.plugin;
+    const backendFile = (0, path_1.join)(pluginScriptsDir, '..', 'scripts', '.active-backend');
+    try {
+        (0, fs_1.writeFileSync)(backendFile, backend, 'utf8');
+    }
+    catch { }
+    // MCP版にも書き込み（両方から参照できるように）
+    const mcpDir = BACKENDS.mcp;
+    const mcpBackendFile = (0, path_1.join)(mcpDir, '.active-backend');
+    try {
+        (0, fs_1.writeFileSync)(mcpBackendFile, backend, 'utf8');
+    }
+    catch { }
+}
+function shellEscape(arg) {
+    return "'" + arg.replace(/'/g, "'\\''") + "'";
+}
 function runNotify(args) {
     try {
-        return (0, child_process_1.execSync)(`${NOTIFY_SH} ${args}`, { encoding: 'utf8', timeout: 3000 });
+        const sh = shellEscape(getNotifySh());
+        return (0, child_process_1.execSync)(`${sh} ${args}`, { encoding: 'utf8', timeout: 3000 });
     }
     catch {
         return '';
     }
 }
 function runNotifyAsync(args) {
-    (0, child_process_1.exec)(`${NOTIFY_SH} ${args}`, { timeout: 30000 });
+    const sh = shellEscape(getNotifySh());
+    (0, child_process_1.exec)(`${sh} ${args}`, { timeout: 30000 }, (err) => {
+        if (err) {
+            console.error('[claude-voice]', err.message);
+        }
+    });
 }
 function getConfigValue(key, defaultValue) {
     try {
-        if ((0, fs_1.existsSync)(CONFIG_FILE)) {
-            const content = (0, fs_1.readFileSync)(CONFIG_FILE, 'utf8');
+        const configFile = getConfigFile();
+        if ((0, fs_1.existsSync)(configFile)) {
+            const content = (0, fs_1.readFileSync)(configFile, 'utf8');
             const match = content.match(new RegExp(`^${key}=(.+)$`, 'm'));
             if (match)
                 return match[1];
@@ -245,7 +343,8 @@ function getCharacterName() {
 }
 function getSpeakers() {
     try {
-        const result = (0, child_process_1.execSync)(`curl -s --max-time 2 http://localhost:50021/speakers`, { encoding: 'utf8', timeout: 5000 });
+        const voicevoxUrl = getConfigValue('VOICEVOX_URL', 'http://localhost:50021');
+        const result = (0, child_process_1.execSync)(`curl -s --max-time 2 ${shellEscape(voicevoxUrl + '/speakers')}`, { encoding: 'utf8', timeout: 5000 });
         const speakers = JSON.parse(result);
         const femaleChars = new Set([
             'ずんだもん', '四国めたん', '春日部つむぎ', '雨晴はう', '波音リツ',
@@ -322,7 +421,7 @@ async function selectDialect() {
     if (charSelected) {
         runNotify(`set-speaker ${charSelected.id}`);
         updateToggleStatus();
-        runNotifyAsync(`"方言キャラクターを変更しました！" complete`);
+        runNotifyAsync('"方言キャラクターを変更しました！" complete');
     }
 }
 async function selectEngine() {

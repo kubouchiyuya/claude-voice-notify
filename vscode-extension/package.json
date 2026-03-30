@@ -1,8 +1,8 @@
 {
   "name": "claude-voice-notify-panel",
   "displayName": "Claude Voice Notify",
-  "description": "VOICEVOX音声通知のON/OFF切り替えと設定パネル",
-  "version": "1.0.0",
+  "description": "VOICEVOX音声通知のON/OFF切り替えと設定パネル（MCP版/Plugin版自動検出・切り替え対応）",
+  "version": "2.0.0",
   "publisher": "kubouchiyuya",
   "engines": {
     "vscode": "^1.80.0"
@@ -35,6 +35,10 @@
       {
         "command": "claude-voice.testPlay",
         "title": "Claude Voice: 🔊 テスト再生"
+      },
+      {
+        "command": "claude-voice.switchBackend",
+        "title": "Claude Voice: 🔄 バックエンド切り替え (MCP/Plugin)"
       }
     ]
   },
