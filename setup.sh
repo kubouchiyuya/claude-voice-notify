@@ -78,28 +78,47 @@ echo "  STEP 2: 音声エンジンを選ぶ"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "  Claude Code が喋る声を選びます。"
-echo "  おすすめは ①VOICEVOX です（無料・かわいい声・すぐ使える）"
+echo "  ※ 基本設計は VOICEVOX（無料）です。迷ったら 1 を選んでください。"
 echo ""
-echo "  ┌─────────────────────────────────────────────────────────┐"
-echo "  │ #  エンジン名         料金         特徴                  │"
-echo "  ├─────────────────────────────────────────────────────────┤"
-echo "  │ 1  VOICEVOX          無料 ★おすすめ ずんだもん等100+キャラ │"
-echo "  │                                    インストールするだけ   │"
-echo "  │                                    APIキー不要           │"
-echo "  ├─────────────────────────────────────────────────────────┤"
-echo "  │ 2  Google Cloud TTS  無料枠あり    月100万文字まで無料    │"
-echo "  │                      (超過後有料)  高品質・自然な声       │"
-echo "  │                                    Google APIキーが必要   │"
-echo "  ├─────────────────────────────────────────────────────────┤"
-echo "  │ 3  その他            様々          Fish Audio, ElevenLabs │"
-echo "  │    (上級者向け)                    OpenAI TTS, 自分の声等 │"
-echo "  │                                    後から切り替え可能     │"
-echo "  └─────────────────────────────────────────────────────────┘"
+echo "  ┌──┬───────────────────┬──────────────┬───────────────────────────────┐"
+echo "  │# │ エンジン名        │ 料金         │ 特徴                          │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │  │【無料エンジン】    │              │                               │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │1 │ VOICEVOX          │ 完全無料     │ ★おすすめ★                   │"
+echo "  │  │ ボイスボックス     │ APIキー不要  │ ずんだもん等 100+キャラ        │"
+echo "  │  │                   │              │ インストールするだけで使える    │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │2 │ COEIROINK         │ 完全無料     │ つくよみちゃん等               │"
+echo "  │  │ コエイロインク     │ APIキー不要  │ VOICEVOX互換API               │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │3 │ AivisSpeech       │ 完全無料     │ 高品質ローカルTTS             │"
+echo "  │  │ アイビススピーチ   │ APIキー不要  │ VOICEVOX互換・高音質          │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │4 │ Style-Bert-VITS2  │ 完全無料     │ 自分の声を学習して使える       │"
+echo "  │  │ スタイルバートビッツ│ APIキー不要  │ 好きなキャラの声も学習可能     │"
+echo "  │  │ ツー              │              │ Udemy動画の声をそのまま使える  │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │  │【有料エンジン】    │              │                               │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │5 │ Google Cloud TTS  │ 無料枠あり   │ 月100万文字まで無料            │"
+echo "  │  │ グーグルクラウド   │ 超過: \$4/100万│ Neural2: 超高品質・自然な声    │"
+echo "  │  │ ティーティーエス   │ 文字         │ Google APIキーが必要           │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │6 │ Fish Audio        │ 従量課金     │ リアルタイム音声クローン       │"
+echo "  │  │ フィッシュオーディオ│ \$0.01/100文字│ 多言語対応・カスタムボイス     │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │7 │ ElevenLabs        │ 無料枠あり   │ 英語音声は業界最高品質         │"
+echo "  │  │ イレブンラボ       │ 月\$5〜       │ 日本語も対応・感情表現が豊か   │"
+echo "  ├──┼───────────────────┼──────────────┼───────────────────────────────┤"
+echo "  │8 │ OpenAI TTS        │ 従量課金     │ nova/alloy/echo等6種の声      │"
+echo "  │  │ オープンエーアイ   │ \$15/100万文字│ ChatGPTと同じ音声技術         │"
+echo "  │  │ ティーティーエス   │              │ OpenAI APIキーが必要           │"
+echo "  └──┴───────────────────┴──────────────┴───────────────────────────────┘"
 echo ""
-echo "  💡 迷ったら 1 を選んでください。"
-echo "     VOICEVOXは無料で、ずんだもんや春日部つむぎなど"
-echo "     100以上のキャラクターの声が使えます。"
-echo "     後から別のエンジンに切り替えることもできます。"
+echo "  💡 一番簡単なのは 1 の VOICEVOX です。"
+echo "     ずんだもんや春日部つむぎなどの声をすぐに使えます。"
+echo "     有料課金しているサービスがあれば、そちらも選べます。"
 echo ""
 read -p "  番号を選択 [1]: " ENGINE_CHOICE
 ENGINE_CHOICE="${ENGINE_CHOICE:-1}"
@@ -107,46 +126,94 @@ ENGINE_CHOICE="${ENGINE_CHOICE:-1}"
 case "$ENGINE_CHOICE" in
   1)
     SELECTED_PROVIDER="voicevox"
-    echo ""
     echo "  ✅ VOICEVOX を選択しました"
     ;;
   2)
+    SELECTED_PROVIDER="coeiroink"
+    echo "  ✅ COEIROINK を選択しました"
+    echo "  ※ COEIROINKアプリの起動が必要です: https://coeiroink.com/"
+    "$NOTIFY_SCRIPT" set-provider coeiroink 2>/dev/null || true
+    ;;
+  3)
+    SELECTED_PROVIDER="aivis_speech"
+    echo "  ✅ AivisSpeech を選択しました"
+    echo "  ※ AivisSpeechアプリの起動が必要です: https://aivis-project.com/"
+    "$NOTIFY_SCRIPT" set-provider aivis_speech 2>/dev/null || true
+    ;;
+  4)
+    SELECTED_PROVIDER="style_bert_vits2"
+    echo "  ✅ Style-Bert-VITS2 を選択しました"
+    echo "  ※ サーバーの起動が必要です: https://github.com/litagin02/Style-Bert-VITS2"
+    read -p "  モデル名 [default]: " SBV2_MODEL
+    SBV2_MODEL="${SBV2_MODEL:-default}"
+    "$NOTIFY_SCRIPT" set-provider style_bert_vits2 2>/dev/null || true
+    ;;
+  5)
     SELECTED_PROVIDER="google"
-    echo ""
     echo "  ✅ Google Cloud TTS を選択しました"
     echo ""
-    echo "  Google Cloud TTS を使うには APIキーが必要です。"
-    echo "  取得方法: https://console.cloud.google.com/apis/credentials"
-    echo "  → 「Text-to-Speech API」を有効化 → APIキーを作成"
+    echo "  APIキーの取得方法:"
+    echo "  1. https://console.cloud.google.com にアクセス"
+    echo "  2. 「Text-to-Speech API」を有効化"
+    echo "  3. 「認証情報」→「APIキーを作成」"
     echo ""
-    read -p "  Google TTS APIキーを入力 (後で設定する場合は空Enter): " GOOGLE_KEY
+    read -p "  Google TTS APIキー (後で設定する場合は空Enter): " GOOGLE_KEY
     if [ -n "$GOOGLE_KEY" ]; then
       "$NOTIFY_SCRIPT" set-google-key "$GOOGLE_KEY"
     else
-      echo "  ⏭️  後で ./notify.sh set-google-key <KEY> で設定してください"
+      echo "  → 後で: ./notify.sh set-google-key <KEY>"
     fi
-    echo ""
-    read -p "  Google TTS 音声名 [ja-JP-Neural2-B]: " GOOGLE_VOICE_NAME
-    if [ -n "$GOOGLE_VOICE_NAME" ]; then
-      "$NOTIFY_SCRIPT" set-google-voice "$GOOGLE_VOICE_NAME"
-    fi
-    "$NOTIFY_SCRIPT" set-provider google
+    "$NOTIFY_SCRIPT" set-provider google 2>/dev/null || true
     ;;
-  3)
+  6)
+    SELECTED_PROVIDER="fish_audio"
+    echo "  ✅ Fish Audio を選択しました"
+    read -p "  Fish Audio APIキー: " FA_KEY
+    if [ -n "$FA_KEY" ]; then
+      grep -v "^FISH_AUDIO_API_KEY=" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" 2>/dev/null || true
+      mv "$CONFIG_FILE.tmp" "$CONFIG_FILE" 2>/dev/null || true
+      echo "FISH_AUDIO_API_KEY=$FA_KEY" >> "$CONFIG_FILE"
+    fi
+    read -p "  Voice ID: " FA_VOICE
+    if [ -n "$FA_VOICE" ]; then
+      grep -v "^FISH_AUDIO_VOICE_ID=" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" 2>/dev/null || true
+      mv "$CONFIG_FILE.tmp" "$CONFIG_FILE" 2>/dev/null || true
+      echo "FISH_AUDIO_VOICE_ID=$FA_VOICE" >> "$CONFIG_FILE"
+    fi
+    "$NOTIFY_SCRIPT" set-provider fish_audio 2>/dev/null || true
+    ;;
+  7)
+    SELECTED_PROVIDER="elevenlabs"
+    echo "  ✅ ElevenLabs を選択しました"
+    read -p "  ElevenLabs APIキー: " EL_KEY
+    if [ -n "$EL_KEY" ]; then
+      grep -v "^ELEVENLABS_API_KEY=" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" 2>/dev/null || true
+      mv "$CONFIG_FILE.tmp" "$CONFIG_FILE" 2>/dev/null || true
+      echo "ELEVENLABS_API_KEY=$EL_KEY" >> "$CONFIG_FILE"
+    fi
+    "$NOTIFY_SCRIPT" set-provider elevenlabs 2>/dev/null || true
+    ;;
+  8)
+    SELECTED_PROVIDER="openai"
+    echo "  ✅ OpenAI TTS を選択しました"
+    read -p "  OpenAI APIキー: " OA_KEY
+    if [ -n "$OA_KEY" ]; then
+      grep -v "^OPENAI_API_KEY=" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" 2>/dev/null || true
+      mv "$CONFIG_FILE.tmp" "$CONFIG_FILE" 2>/dev/null || true
+      echo "OPENAI_API_KEY=$OA_KEY" >> "$CONFIG_FILE"
+    fi
+    echo ""
+    echo "  音声: nova(女性) / alloy(中性) / echo(男性) / fable / onyx / shimmer"
+    read -p "  音声名 [nova]: " OA_VOICE
+    OA_VOICE="${OA_VOICE:-nova}"
+    grep -v "^OPENAI_TTS_VOICE=" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" 2>/dev/null || true
+    mv "$CONFIG_FILE.tmp" "$CONFIG_FILE" 2>/dev/null || true
+    echo "OPENAI_TTS_VOICE=$OA_VOICE" >> "$CONFIG_FILE"
+    "$NOTIFY_SCRIPT" set-provider openai 2>/dev/null || true
+    ;;
+  *)
     SELECTED_PROVIDER="voicevox"
-    echo ""
-    echo "  まずはVOICEVOXでセットアップします。"
-    echo "  後から ./notify.sh set-provider <名前> で切り替えできます。"
-    echo ""
-    echo "  対応エンジン:"
-    echo "    voicevox       - 無料・ローカル（デフォルト）"
-    echo "    google          - Google Cloud TTS（無料枠あり）"
-    echo "    coeiroink       - 無料・ローカル"
-    echo "    aivis_speech    - 無料・高品質ローカル"
-    echo "    style_bert_vits2- 無料・自分の声を学習可能"
-    echo "    fish_audio      - 有料・クラウド"
-    echo "    elevenlabs      - 有料（無料枠あり）・英語最強"
-    echo "    openai          - 有料・OpenAI TTS"
+    echo "  ✅ デフォルト: VOICEVOX を選択しました"
     ;;
 esac
 
@@ -267,64 +334,146 @@ if [ "$SELECTED_PROVIDER" = "voicevox" ] && [ "$VOICEVOX_RUNNING" = true ]; then
   echo "  STEP 5: キャラクターを選ぶ 🎤"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
-  echo "  VOICEVOXのキャラクターを選んでください。"
-  echo "  （後から ./notify.sh set-speaker <ID> で変更できます）"
+  echo "  まず、どんな声がいいか教えてください。"
   echo ""
+  echo "  【性別で選ぶ】"
+  echo "    1) 女性キャラクター"
+  echo "    2) 男性キャラクター"
+  echo "    3) 全て表示"
+  echo ""
+  read -p "  選択 [1]: " GENDER_CHOICE
+  GENDER_CHOICE="${GENDER_CHOICE:-1}"
 
+  echo ""
+  echo "  【性格・雰囲気で選ぶ】"
+  echo "    1) やさしい・初心者にわかりやすい（あまあま・ノーマル）"
+  echo "    2) 元気・明るい（ノーマル・うきうき・元気）"
+  echo "    3) クール・かっこいい（ツンツン・クイーン・シリアス）"
+  echo "    4) かわいい・癒し系（ささやき・ヒソヒソ・あまあま）"
+  echo "    5) 全スタイル表示"
+  echo ""
+  read -p "  選択 [1]: " PERSONALITY_CHOICE
+  PERSONALITY_CHOICE="${PERSONALITY_CHOICE:-1}"
+
+  # Pythonでフィルタリング表示
   curl -s "$VOICEVOX_URL/speakers" 2>/dev/null | python3 -c "
 import json, sys
-speakers = json.load(sys.stdin)
 
-# 人気キャラをグループ表示
-groups = {
-    'ずんだもん': [],
-    '四国めたん': [],
-    'その他（人気）': [],
+speakers = json.load(sys.stdin)
+gender = '$GENDER_CHOICE'
+personality = '$PERSONALITY_CHOICE'
+
+# キャラの性別データ
+female_chars = [
+    'ずんだもん', '四国めたん', '春日部つむぎ', '雨晴はう', '波音リツ',
+    '冥鳴ひまり', '九州そら', 'もち子さん', 'WhiteCUL', '櫻歌ミコ',
+    '小夜/SAYO', '春歌ナナ', '猫使アル', '猫使ビィ', '中国うさぎ',
+    '栗田まろん', 'あいえるたん', '満別花丸', '琴詠ニア', 'ぞん子',
+    'ユーレイちゃん', '東北ずん子', '東北きりたん', '東北イタコ',
+    'あんこもん', 'ナースロボ＿タイプＴ', 'No.7', '黒沢冴白',
+]
+male_chars = [
+    '玄野武宏', '白上虎太郎', '青山龍星', '剣崎雌雄',
+    '後鬼', 'ちび式じい', '雀松朱司', '麒ヶ島宗麟',
+    '†聖騎士 紅桜†', '中部つるぎ', '離途', 'Voidoll',
+]
+
+# 性格フィルタ
+gentle_styles = ['ノーマル', 'あまあま', 'ふつう', '読み聞かせ', 'のんびり', '甘々', 'おちつき']
+energetic_styles = ['ノーマル', 'ふつう', 'うきうき', '元気', 'わーい', '熱血', '喜び', '覚醒', 'つよつよ']
+cool_styles = ['ツンツン', 'クイーン', 'シリアス', 'ツンギレ', '不機嫌', 'セクシー', '実況風', 'アナウンス']
+cute_styles = ['ささやき', 'ヒソヒソ', 'あまあま', '甘々', 'ロリ', 'びくびく', '人見知り', '内緒話', 'よわよわ', 'へろへろ']
+
+style_filter = None
+if personality == '1': style_filter = gentle_styles
+elif personality == '2': style_filter = energetic_styles
+elif personality == '3': style_filter = cool_styles
+elif personality == '4': style_filter = cute_styles
+
+results = []
+for s in speakers:
+    # 性別フィルタ
+    if gender == '1' and s['name'] not in female_chars: continue
+    if gender == '2' and s['name'] not in male_chars: continue
+
+    for st in s['styles']:
+        # 性格フィルタ
+        if style_filter and st['name'] not in style_filter: continue
+        results.append((st['id'], s['name'], st['name']))
+
+if not results:
+    print('  該当するキャラクターがありません。全て表示します。')
+    for s in speakers:
+        for st in s['styles']:
+            results.append((st['id'], s['name'], st['name']))
+
+# 性格の日本語説明
+personality_desc = {
+    'ノーマル': '標準', 'あまあま': 'やさしい', 'ツンツン': 'クール',
+    'セクシー': '大人っぽい', 'ささやき': '囁き声', 'ヒソヒソ': '小声',
+    'ヘロヘロ': '疲れ気味', 'なみだめ': '泣きそう', 'ふつう': '標準',
+    'わーい': '喜び', 'びくびく': '怖がり', 'おこ': '怒り',
+    'びえーん': '泣き', '熱血': '情熱的', '不機嫌': '不機嫌',
+    '喜び': '嬉しい', 'しっとり': '落ち着き', 'かなしい': '悲しい',
+    'かなしみ': '悲しい', '囁き': '囁き声', 'たのしい': '楽しい',
+    'クイーン': '威厳', 'ロリ': 'かわいい', 'アナウンス': '丁寧',
+    '読み聞かせ': 'やさしい', '楽々': 'リラックス', '恐怖': '怖い',
+    '内緒話': 'ひそひそ', 'おちつき': '落ち着き', 'うきうき': 'ワクワク',
+    'つよつよ': '力強い', 'へろへろ': 'ゆるい', '人見知り': 'おとなしい',
+    'おどろき': 'びっくり', 'こわがり': '怖がり', '元気': '元気',
+    'ぶりっ子': 'かわいこぶり', 'ボーイ': 'ボーイッシュ',
+    'のんびり': 'のんびり', '泣き': '泣き', '怒り': '怒り',
+    'シリアス': '真剣', '実況風': 'テンション高い', '覚醒': '覚醒',
+    '低血圧': 'けだるい', 'おどおど': 'おどおど', '絶望と敗北': '絶望',
+    '第二形態': '強気', 'セクシー／あん子': '大人っぽい',
+    '甘々': 'やさしい', '哀しみ': '悲しい', 'ツクモちゃん': '元気',
+    'よわよわ': '弱々しい', 'けだるげ': 'だるそう',
+    '鬼ver.': '力強い', 'ぬいぐるみver.': 'かわいい',
+    '人間ver.': '標準', '人間（怒り）ver.': '怒り',
+    'ツンギレ': 'ツンデレ', '悲しみ': '悲しい',
 }
 
-popular_other = [8, 10, 9, 13, 14, 20, 46, 107, 108, 109]
+print(f'  該当: {len(results)}件')
+print()
+for sid, name, style in results[:30]:
+    desc = personality_desc.get(style, '')
+    desc_str = f' [{desc}]' if desc else ''
+    print(f'    {sid:3d}: {name}（{style}）{desc_str}')
 
-for s in speakers:
-    for st in s['styles']:
-        entry = f'    {st[\"id\"]:3d}: {s[\"name\"]}（{st[\"name\"]}）'
-        if 'ずんだもん' in s['name']:
-            groups['ずんだもん'].append(entry)
-        elif '四国めたん' in s['name']:
-            groups['四国めたん'].append(entry)
-        elif st['id'] in popular_other:
-            groups['その他（人気）'].append(entry)
-
-for group, entries in groups.items():
-    print(f'  【{group}】')
-    for e in entries[:6]:
-        print(e)
-    if len(entries) > 6:
-        print(f'    ... 他 {len(entries)-6} スタイル')
-    print()
-
-total = sum(len(s['styles']) for s in speakers)
-print(f'  全{total}キャラの一覧: ./notify.sh list')
+if len(results) > 30:
+    print(f'    ... 他 {len(results)-30} 件（./notify.sh list で全表示）')
+print()
 " 2>/dev/null || true
 
-  echo ""
-  echo "  💡 おすすめ: 3（ずんだもん ノーマル）"
+  echo "  💡 おすすめ:"
+  echo "    3: ずんだもん（ノーマル）  [初心者向け・やさしい]"
+  echo "    1: ずんだもん（あまあま）  [とてもやさしい]"
+  echo "    8: 春日部つむぎ（ノーマル）[元気・明るい]"
   echo ""
   read -p "  スピーカーID [3]: " SELECTED_SPEAKER
   SELECTED_SPEAKER="${SELECTED_SPEAKER:-3}"
   "$NOTIFY_SCRIPT" set-speaker "$SELECTED_SPEAKER"
 
-  # 選んだキャラで試し聞き
+  # 試し聞き
   echo ""
-  echo "  🔊 選んだキャラクターの声をテストします..."
-  "$NOTIFY_SCRIPT" "こんにちは！これから音声通知でお知らせするね！" complete
+  echo "  🔊 声をテストします..."
+  "$NOTIFY_SCRIPT" "こんにちは！これから音声通知でお知らせするね！よろしくね！" complete
   echo ""
   read -p "  この声でOKですか？ [Y/n]: " VOICE_OK
   if [ "$VOICE_OK" = "n" ] || [ "$VOICE_OK" = "N" ]; then
-    echo "  → ./notify.sh list で一覧を確認して"
-    echo "    ./notify.sh set-speaker <ID> で変更してください"
-  else
-    echo "  ✅ キャラクター設定完了！"
+    echo ""
+    echo "  別のIDで試してみましょう。"
+    read -p "  スピーカーID: " RETRY_SPEAKER
+    if [ -n "$RETRY_SPEAKER" ]; then
+      "$NOTIFY_SCRIPT" set-speaker "$RETRY_SPEAKER"
+      "$NOTIFY_SCRIPT" "この声はどうかな？気に入ってもらえると嬉しいな！" complete
+      read -p "  OKですか？ [Y/n]: " VOICE_OK2
+      if [ "$VOICE_OK2" = "n" ] || [ "$VOICE_OK2" = "N" ]; then
+        echo "  → 後から ./notify.sh set-speaker <ID> で変更してください"
+      fi
+    fi
   fi
+  echo "  ✅ キャラクター設定完了！"
 fi
 
 # ============================================

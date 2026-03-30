@@ -1,0 +1,31 @@
+name: Notify Stargazers on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Discussion for Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release = context.payload.release;
+
+            // リリースノートをDiscussionに投稿
+            // (Stargazerは Watch > Releases で通知を受け取れる)
+            console.log(`Release ${release.tag_name} published: ${release.name}`);
+            console.log(`Stargazers will be notified via GitHub's built-in notification system`);
+
+            // Issueとしてリリースノートを作成（通知が確実に届く）
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔔 アップデート: ${release.tag_name} - ${release.name}`,
+              body: `## ${release.name}\n\n${release.body}\n\n---\n\n**更新方法:**\n\`\`\`bash\ncd claude-voice-notify\n./update.sh\n\`\`\`\n\nこのIssueは自動生成されたリリース通知です。`,
+              labels: ['release-notification']
+            });

@@ -324,6 +324,19 @@ Udemy や動画制作で使った自分の声をそのまま通知音声にす�
 
 ---
 
+## アップデート
+
+クローンした人はワンコマンドで最新版に更新できます：
+
+```bash
+./update.sh
+```
+
+- 更新内容を確認 → 確認後に `git pull` & `npm run build` を自動実行
+- リリース通知を受け取るには、リポジトリを **Watch > Releases only** に設定してください
+
+---
+
 ## トラブルシューティング
 
 | 症状 | 原因 | 対処 |
@@ -337,12 +350,16 @@ Udemy や動画制作で使った自分の声をそのまま通知音声にす�
 
 ## ライセンス
 
-MIT License - [Masa_AIcreater](https://github.com/Masa_AIcreater)
+MIT License - [kubouchiyuya](https://github.com/kubouchiyuya)
 
 ## 謝辞
 
-- [VOICEVOX](https://voicevox.hiroshiba.jp/) - 無料の音声合成エンジン
-- [COEIROINK](https://coeiroink.com/) - 無料の音声合成ソフトウェア
+- [VOICEVOX](https://voicevox.hiroshiba.jp/) - 無料の音声合成エンジン（ずんだもん等）
+- [COEIROINK](https://coeiroink.com/) - 無料の音声合成ソフトウェア（つくよみちゃん等）
 - [AivisSpeech](https://aivis-project.com/) - 高品質ローカル TTS
 - [Style-Bert-VITS2](https://github.com/litagin02/Style-Bert-VITS2) - カスタム音声学習
+- [Google Cloud TTS](https://cloud.google.com/text-to-speech) - 高品質クラウド TTS
+- [Fish Audio](https://fish.audio/) - リアルタイム音声クローン
+- [ElevenLabs](https://elevenlabs.io/) - 感情豊かな音声合成
+- [OpenAI TTS](https://platform.openai.com/docs/guides/text-to-speech) - OpenAI 音声技術
 - [MCP](https://modelcontextprotocol.io/) - Model Context Protocol
