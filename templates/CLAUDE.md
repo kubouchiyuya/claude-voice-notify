@@ -17,9 +17,32 @@ Bashツールで以下を実行する:
 
 パスは各ユーザーの環境に合わせて変更すること。
 
-## 必ず音声で通知するタイミングと内容
+## 絶対に音声で通知する場面（必須・スキップ不可）
 
-### 1. タスク完了時
+以下の場面では**必ず** notify.sh を呼ぶこと。
+
+### 0. タスク開始時 — 今から何をするか宣言する
+
+ユーザーから指示を受けたら、作業を始める前に必ず宣言する。
+
+```bash
+notify.sh "了解しました。これからログイン機能を実装します" complete
+notify.sh "バグの調査を開始します。まずエラーログを確認します" complete
+notify.sh "リファクタリングを始めます。3つのファイルを修正する予定です" complete
+```
+
+### 0.5. 開発が止まる時 — ユーザーの入力・判断待ち（最重要）
+
+開発が停止する全ての場面で必ず音声通知する。
+
+```bash
+notify.sh "作業が止まっています。APIキーが必要です。設定してもらえますか？" confirm
+notify.sh "質問があります。テストデータはどのような形式にしますか？" confirm
+notify.sh "承認が必要です。本番環境にデプロイしてよいですか？" confirm
+notify.sh "2つの方法があります。どちらにしますか？" confirm
+```
+
+### 1. タスク完了時 — 必ず完了報告する
 
 具体的に何をしたかを説明する。「タスクが完了しました」のような汎用メッセージは禁止。
 
@@ -138,6 +161,7 @@ notify.sh status  # 現在の状態を確認
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #8146 | 3:26 PM | ✅ | Enhanced CLAUDE.md template with task start and blocking event notifications | ~374 |
 | #8131 | 3:15 PM | 🟣 | Voice notification toggle with persistent state for meeting-friendly muting | ~372 |
 | #8120 | 3:11 PM | 🟣 | Enhanced CLAUDE.md template with detailed notification guidelines and explanation mode | ~566 |
 | #8100 | 1:32 PM | 🟣 | Initial repository commit for multi-provider voice notification MCP server | ~393 |
