@@ -7,6 +7,7 @@
 #   ./notify.sh list                                  # VOICEVOXキャラクター一覧
 #   ./notify.sh set-speaker 3                         # デフォルトキャラを変更
 #   ./notify.sh set-provider google                   # プロバイダー変更 (voicevox/google)
+#   ./notify.sh set-volume 0.5                         # デフォルト音量変更 (0.0〜1.0)
 #   ./notify.sh on / off / status                     # 音声オン/オフ
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -18,6 +19,7 @@ VOICEVOX_URL="${VOICEVOX_URL:-http://localhost:50021}"
 DEFAULT_SPEAKER="${VOICEVOX_SPEAKER:-3}"
 DEFAULT_PROVIDER="voicevox"
 DEFAULT_SPEED="1.0"
+DEFAULT_VOLUME="1.0"
 GOOGLE_VOICE="${GOOGLE_TTS_VOICE:-ja-JP-Neural2-B}"
 GOOGLE_API_KEY="${GOOGLE_TTS_API_KEY:-}"
 
@@ -47,6 +49,7 @@ case "$1" in
     echo "  プロバイダー: $DEFAULT_PROVIDER"
     echo "  スピーカーID: $DEFAULT_SPEAKER"
     echo "  速度: $DEFAULT_SPEED"
+    echo "  音量: $DEFAULT_VOLUME"
     exit 0
     ;;
   list)
@@ -105,6 +108,20 @@ print('ID $NEW_SPEAKER')
     fi
     echo "DEFAULT_PROVIDER=$NEW_PROVIDER" >> "$CONFIG_FILE"
     echo "[claude-voice-notify] プロバイダーを変更: $NEW_PROVIDER"
+    exit 0
+    ;;
+  set-volume)
+    NEW_VOLUME="${2:-1.0}"
+    if ! python3 -c "v=float('$NEW_VOLUME'); assert 0.0<=v<=1.0" 2>/dev/null; then
+      echo "エラー: 音量は 0.0〜1.0 の範囲で指定してください"
+      exit 1
+    fi
+    if [ -f "$CONFIG_FILE" ]; then
+      grep -v "^DEFAULT_VOLUME=" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" || true
+      mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    fi
+    echo "DEFAULT_VOLUME=$NEW_VOLUME" >> "$CONFIG_FILE"
+    echo "[claude-voice-notify] デフォルト音量を変更: ${NEW_VOLUME}"
     exit 0
     ;;
   set-speed)
@@ -179,13 +196,14 @@ try_voicevox() {
     return 1
   fi
 
-  # 速度調整
+  # 速度・音量調整
   QUERY=$(echo "$QUERY" | python3 -c "
 import json,sys
 q = json.load(sys.stdin)
 q['speedScale'] = float(sys.argv[1])
+q['volumeScale'] = float(sys.argv[2])
 print(json.dumps(q))
-" "$SPEED" 2>/dev/null || echo "$QUERY")
+" "$SPEED" "$DEFAULT_VOLUME" 2>/dev/null || echo "$QUERY")
 
   TMPFILE=$(mktemp /tmp/claude-voice-XXXXXX.wav)
   HTTP_CODE=$(curl -s -o "$TMPFILE" -w "%{http_code}" --max-time 30 -X POST \
@@ -194,7 +212,7 @@ print(json.dumps(q))
     "$VOICEVOX_URL/synthesis?speaker=$SPEAKER")
 
   if [ "$HTTP_CODE" = "200" ] && [ -s "$TMPFILE" ]; then
-    afplay "$TMPFILE" 2>/dev/null
+    afplay -v "$DEFAULT_VOLUME" "$TMPFILE" 2>/dev/null
     rm -f "$TMPFILE" 2>/dev/null
     return 0
   else
@@ -232,7 +250,7 @@ else:
 " > "$TMPFILE" 2>&1)
 
   if [ $? -eq 0 ] && [ -s "$TMPFILE" ]; then
-    afplay "$TMPFILE" 2>/dev/null
+    afplay -v "$DEFAULT_VOLUME" "$TMPFILE" 2>/dev/null
     rm -f "$TMPFILE" 2>/dev/null
     return 0
   else

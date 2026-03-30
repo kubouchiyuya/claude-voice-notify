@@ -7,6 +7,8 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #8183 | 5:24 PM | 🔵 | Provider-based architecture with cross-platform audio playback | ~309 |
+| #8182 | " | 🔵 | Two afplay invocations in notify.sh need volume parameter integration | ~260 |
 | #8109 | 2:56 PM | 🟣 | Hooks-based notification system with automated setup installer shipped to GitHub | ~405 |
 | #8100 | 1:32 PM | 🟣 | Initial repository commit for multi-provider voice notification MCP server | ~393 |
 </claude-mem-context>

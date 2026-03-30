@@ -30,37 +30,68 @@ Claude Code がタスク完了・確認要求・エラー発生時に**音声で
 
 ---
 
-## 導入手順
+## 導入手順（10ステップ）
 
 ### 方法 A: ワンコマンドセットアップ（推奨）
+
+> 💡 **どこにクローンすればいい？** お好きな場所で OK です。おすすめは:
+> - macOS / Linux: `~/Projects/` または `~/dev/`
+> - Windows: `C:\Users\<ユーザー名>\Projects\`
+>
+> 例: `cd ~/Projects && git clone ...`
 
 **macOS / Linux:**
 
 ```bash
+# ① Star する（必須） → https://github.com/kubouchiyuya/claude-voice-notify
+# ② 好きなディレクトリに移動（例: ~/Projects）
+cd ~/Projects
+
+# ③ クローン
 git clone https://github.com/kubouchiyuya/claude-voice-notify.git
+
+# ④ ディレクトリに入る
 cd claude-voice-notify
+
+# ⑤ セットアップ実行（あとは全自動）
 ./setup.sh
 ```
 
 **Windows:**
 
 ```cmd
+cd %USERPROFILE%\Projects
 git clone https://github.com/kubouchiyuya/claude-voice-notify.git
 cd claude-voice-notify
 setup.bat
 ```
 
-セットアップスクリプトが以下を自動で行います：
-- VOICEVOX の検出・自動インストール（macOS: GitHub Releases / Windows: winget）
-- `npm install` & `npm run build`
-- Claude Code Hooks の設定ガイド
-- 音声テスト
+**setup.sh / setup.bat が自動で行うこと：**
 
-**VOICEVOX がなくても動きます：**
-- macOS → `say` コマンド（Kyoko）に自動フォールバック
-- Windows → Windows SAPI（日本語音声）に自動フォールバック
+| ステップ | 内容 |
+|---------|------|
+| ⑤-1 | GitHub Star の確認（ユーザー名を聞かれます） |
+| ⑤-2 | VOICEVOX の検出・インストール案内 |
+| ⑤-3 | `npm install` & `npm run build` |
+| ⑤-4 | プロバイダー選択（対話式で8種から選べる） |
+| ⑤-5 | キャラクター選択（性別・方言フィルター付き） |
+| ⑤-6 | VS Code 拡張機能の自動インストール |
+| ⑤-7 | Claude Code Hooks 設定ガイド表示 |
+| ⑤-8 | 音声テスト再生 |
 
-後から VOICEVOX をインストール・起動すれば、自動的にずんだもんの声に切り替わります。
+**セットアップ後にやること：**
+
+```bash
+# ⑥ VOICEVOX を起動（まだの場合）
+# ⑦ Claude Code Hooks を ~/.claude/settings.json にコピペ（画面の指示に従う）
+# ⑧ テスト
+./notify.sh "テスト成功"
+
+# ⑨ 設定パネルでカスタマイズ（キャラ・速度・音量・エンジン）
+./settings.sh
+
+# ⑩ 完了！Claude Code が音声で通知してくれます
+```
 
 ### 方法 B: 手動セットアップ
 
@@ -269,6 +300,24 @@ Google Cloud TTS は月100万文字まで無料。`./notify.sh set-provider goog
 
 ---
 
+## 音量・速度調整
+
+```bash
+# 音量調整（0.0〜1.0、デフォルト: 1.0）
+./notify.sh set-volume 0.5    # 半分の音量
+./notify.sh set-volume 0.3    # 控えめ（会議中のお隣さん対策）
+./notify.sh set-volume 1.0    # 最大音量
+
+# 速度調整（0.5〜2.0、デフォルト: 1.0）
+./notify.sh set-speed 1.2     # やや速め
+./notify.sh set-speed 0.8     # ゆっくり
+
+# 設定パネル（GUIライクな対話式メニュー）
+./settings.sh
+```
+
+---
+
 ## キャラクター管理
 
 ```bash
@@ -334,6 +383,36 @@ Udemy や動画制作で使った自分の声をそのまま通知音声にす�
 
 - 更新内容を確認 → 確認後に `git pull` & `npm run build` を自動実行
 - リリース通知を受け取るには、リポジトリを **Watch > Releases only** に設定してください
+
+---
+
+## ディレクトリ構成
+
+クローン後のディレクトリはこのようになっています：
+
+```
+claude-voice-notify/
+├── notify.sh          ← 音声通知の本体（bashから直接呼べる）
+├── settings.sh        ← 設定パネル（キャラ・速度・音量・エンジン）
+├── setup.sh           ← 初回セットアップ（自動インストール）
+├── update.sh          ← ワンコマンド更新
+├── .voice-config      ← 設定ファイル（自動生成・gitignore済み）
+├── .voice-enabled     ← ON/OFF状態（自動生成）
+├── src/               ← MCP サーバー本体（TypeScript）
+│   ├── index.ts       ← MCPエントリーポイント
+│   ├── provider-base.ts ← 音声再生共通処理
+│   └── providers/     ← 各プロバイダー実装
+├── dist/              ← ビルド済み（npm run build で生成）
+├── templates/
+│   └── CLAUDE.md      ← プロジェクトに組み込むテンプレート
+├── vscode-extension/  ← VS Code 拡張機能
+└── CLAUDE.md          ← Claude Code 用の設定指示
+```
+
+**設定ファイル（`.voice-config`）の保存場所：**
+- クローンしたディレクトリ直下に自動生成されます
+- Git にはコミットされません（`.gitignore` 済み）
+- 手動で編集も可能（key=value 形式）
 
 ---
 

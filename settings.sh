@@ -10,6 +10,7 @@ VOICEVOX_URL="${VOICEVOX_URL:-http://localhost:50021}"
 # 設定読み込み
 DEFAULT_SPEAKER=3
 DEFAULT_SPEED="1.0"
+DEFAULT_VOLUME="1.0"
 DEFAULT_PROVIDER="voicevox"
 if [ -f "$CONFIG_FILE" ]; then source "$CONFIG_FILE"; fi
 
@@ -49,6 +50,11 @@ show_menu() {
   # 速度ゲージ表示
   show_speed_gauge "$DEFAULT_SPEED"
 
+  echo "  音量: ${DEFAULT_VOLUME}"
+
+  # 音量ゲージ表示
+  show_volume_gauge "$DEFAULT_VOLUME"
+
   echo "  エンジン: $DEFAULT_PROVIDER"
   echo "  ─────────────────────────────────────────"
   echo ""
@@ -57,8 +63,9 @@ show_menu() {
   echo "    2) 🎤 キャラクター変更"
   echo "    3) 🗾 方言で選ぶ"
   echo "    4) ⏩ 速度調整"
-  echo "    5) 🔧 エンジン変更"
-  echo "    6) 🔊 テスト再生"
+  echo "    5) 🔉 音量調整"
+  echo "    6) 🔧 エンジン変更"
+  echo "    7) 🔊 テスト再生"
   echo "    q) 閉じる"
   echo ""
   read -p "  選択: " CHOICE
@@ -81,6 +88,73 @@ show_speed_gauge() {
   done
   gauge="${gauge}] 2.0x"
   echo "$gauge"
+}
+
+show_volume_gauge() {
+  local vol=$1
+  local gauge=""
+  # 0.0 〜 1.0 を 30文字のゲージで表現
+  local pos=$(python3 -c "print(int($vol / 1.0 * 30))" 2>/dev/null || echo 30)
+  local i=0
+  gauge="  音量: 0.0  ["
+  while [ $i -lt 30 ]; do
+    if [ $i -eq $pos ]; then
+      gauge="${gauge}●"
+    elif [ $i -lt $pos ]; then
+      gauge="${gauge}█"
+    else
+      gauge="${gauge}─"
+    fi
+    i=$((i+1))
+  done
+  gauge="${gauge}] 1.0"
+  echo "$gauge"
+}
+
+volume_adjust() {
+  while true; do
+    clear 2>/dev/null || true
+    echo ""
+    echo "  🔉 音量調整"
+    echo ""
+    show_volume_gauge "$DEFAULT_VOLUME"
+    echo ""
+    echo "  現在: ${DEFAULT_VOLUME}"
+    echo ""
+    echo "    +) 大きくする (+0.1)"
+    echo "    -) 小さくする (-0.1)"
+    echo "    数字) 直接入力 (例: 0.5)"
+    echo "    t) この音量でテスト再生"
+    echo "    q) 戻る"
+    echo ""
+    read -p "  選択: " VCHOICE
+
+    case "$VCHOICE" in
+      +)
+        DEFAULT_VOLUME=$(python3 -c "print(min(1.0, round($DEFAULT_VOLUME + 0.1, 1)))")
+        "$NOTIFY" set-volume "$DEFAULT_VOLUME" > /dev/null
+        ;;
+      -)
+        DEFAULT_VOLUME=$(python3 -c "print(max(0.0, round($DEFAULT_VOLUME - 0.1, 1)))")
+        "$NOTIFY" set-volume "$DEFAULT_VOLUME" > /dev/null
+        ;;
+      t)
+        "$NOTIFY" "この音量はどうですか？聞き取りやすいですか？" complete
+        ;;
+      q|Q)
+        return
+        ;;
+      *)
+        if python3 -c "v=float('$VCHOICE'); assert 0.0<=v<=1.0" 2>/dev/null; then
+          DEFAULT_VOLUME="$VCHOICE"
+          "$NOTIFY" set-volume "$DEFAULT_VOLUME" > /dev/null
+        else
+          echo "  ⚠️ 0.0〜1.0 の範囲で入力してください"
+          sleep 1
+        fi
+        ;;
+    esac
+  done
 }
 
 speed_adjust() {
@@ -258,7 +332,8 @@ while true; do
     2) character_select ;;
     3) dialect_select ;;
     4) speed_adjust ;;
-    5)
+    5) volume_adjust ;;
+    6)
       echo ""
       echo "  エンジン: voicevox / google / coeiroink / aivis_speech"
       echo "           style_bert_vits2 / fish_audio / elevenlabs / openai"
@@ -268,7 +343,7 @@ while true; do
         DEFAULT_PROVIDER="$NEW_ENG"
       fi
       ;;
-    6)
+    7)
       "$NOTIFY" "テスト再生です。この声とスピードで通知されます" complete
       ;;
     q|Q)

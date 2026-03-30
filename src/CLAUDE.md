@@ -7,6 +7,11 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #8189 | 5:26 PM | 🔵 | Exploration agent completed comprehensive analysis confirming volume control gap | ~407 |
+| #8187 | 5:25 PM | 🔵 | MCP server has partial volume support only in notify_speak tool | ~401 |
+| #8186 | " | 🔵 | Type definitions include volume throughout the stack | ~312 |
+| #8185 | " | 🔵 | Linux volume control missing from TypeScript playAudio implementation | ~323 |
+| #8184 | 5:24 PM | 🔵 | Volume control already implemented in TypeScript layer but not exposed in shell scripts | ~383 |
 | #8100 | 1:32 PM | 🟣 | Initial repository commit for multi-provider voice notification MCP server | ~393 |
 | #8082 | 1:23 PM | 🟣 | Cross-platform audio playback functionality implemented | ~270 |
 </claude-mem-context>

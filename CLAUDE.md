@@ -13,6 +13,7 @@ $NOTIFY "メッセージ" complete 3 1.2           # タイプ/スピーカーID
 $NOTIFY list                                  # VOICEVOXキャラ一覧（★=現在）
 $NOTIFY set-speaker 8                         # デフォルトキャラ変更（例: 春日部つむぎ）
 $NOTIFY set-speed 1.2                         # デフォルト速度変更
+$NOTIFY set-volume 0.5                        # デフォルト音量変更（0.0〜1.0）
 
 # プロバイダー切り替え
 $NOTIFY set-provider voicevox                 # VOICEVOX（デフォルト）
@@ -23,7 +24,7 @@ $NOTIFY set-google-voice ja-JP-Neural2-B      # Google音声名変更
 # オン/オフ
 $NOTIFY on / off / status
 
-# 設定パネル（キャラ・速度・方言・エンジン）
+# 設定パネル（キャラ・速度・音量・方言・エンジン）
 /Users/kubouchiyuya/Projects/claude-voice-notify/settings.sh
 ```
 

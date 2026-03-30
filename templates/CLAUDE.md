@@ -127,6 +127,16 @@ notify.sh "メッセージ" complete 1 1.3  # 1.3倍速（少し早め）
 notify.sh "長い解説..." explain 1 0.9  # 0.9倍速（ゆっくり）
 ```
 
+## 音量調整
+
+```bash
+notify.sh set-volume 0.5    # 半分の音量
+notify.sh set-volume 0.3    # 控えめ
+notify.sh set-volume 1.0    # 最大音量（デフォルト）
+```
+
+範囲: 0.0（無音）〜 1.0（最大）。設定パネル（`settings.sh`）からも調整可能。
+
 ## 音声追加・カスタマイズ
 
 ユーザーが新しい音声を追加したい場合:
