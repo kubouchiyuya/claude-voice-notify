@@ -326,12 +326,90 @@ npm run build --silent
 echo "  ✅ ビルド完了"
 
 # ============================================
-# STEP 5: キャラクター選択（VOICEVOX時のみ）
+# STEP 5: VS Code 拡張機能インストール
+# ============================================
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  STEP 5: VS Code 拡張機能"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+VSCODE_EXT_DIR="$SCRIPT_DIR/vscode-extension"
+VSCODE_EXT_INSTALLED=false
+
+# VS Code の code コマンドを探す
+VSCODE_CMD=""
+if command -v code > /dev/null 2>&1; then
+  VSCODE_CMD="code"
+elif [ -f "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]; then
+  VSCODE_CMD="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+elif [ -f "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]; then
+  VSCODE_CMD="$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+elif command -v cursor > /dev/null 2>&1; then
+  VSCODE_CMD="cursor"
+fi
+
+if [ -n "$VSCODE_CMD" ] && [ -d "$VSCODE_EXT_DIR" ]; then
+  echo "  ✅ VS Code を検出しました"
+  echo "  📦 拡張機能をビルド中..."
+
+  # 依存関係インストール
+  if [ ! -d "$VSCODE_EXT_DIR/node_modules/@types/vscode" ]; then
+    (cd "$VSCODE_EXT_DIR" && npm install --silent 2>/dev/null)
+  fi
+
+  # TypeScript コンパイル
+  (cd "$VSCODE_EXT_DIR" && npm run compile --silent 2>/dev/null)
+
+  if [ -f "$VSCODE_EXT_DIR/out/extension.js" ]; then
+    # VSIX パッケージ作成
+    VSIX_FILE="$VSCODE_EXT_DIR/claude-voice-notify-panel-1.0.0.vsix"
+
+    if command -v vsce > /dev/null 2>&1; then
+      (cd "$VSCODE_EXT_DIR" && vsce package --allow-missing-repository -o "$VSIX_FILE" 2>/dev/null)
+    elif command -v npx > /dev/null 2>&1; then
+      (cd "$VSCODE_EXT_DIR" && npx --yes @vscode/vsce package --allow-missing-repository -o "$VSIX_FILE" 2>/dev/null)
+    fi
+
+    if [ -f "$VSIX_FILE" ]; then
+      echo "  📦 拡張機能をインストール中..."
+      "$VSCODE_CMD" --install-extension "$VSIX_FILE" --force 2>/dev/null
+      if [ $? -eq 0 ]; then
+        VSCODE_EXT_INSTALLED=true
+        echo "  ✅ VS Code 拡張機能インストール完了！"
+        echo "     ステータスバーに 🔊 Voice ON / ⚙️ VB設定 が表示されます"
+        echo "     ※ VS Code のリロードが必要な場合: Cmd+Shift+P → Reload Window"
+      else
+        echo "  ⚠️  拡張機能のインストールに失敗しました"
+        echo "     手動: $VSCODE_CMD --install-extension $VSIX_FILE"
+      fi
+    else
+      echo "  ⚠️  VSIXパッケージの作成に失敗しました"
+      echo "     vsce がインストールされていない可能性があります"
+      echo "     → npm install -g @vscode/vsce してから再実行してください"
+    fi
+  else
+    echo "  ⚠️  TypeScript コンパイルに失敗しました"
+  fi
+else
+  if [ -z "$VSCODE_CMD" ]; then
+    echo "  ⏭️  VS Code が見つかりません（スキップ）"
+    echo "     後からインストールする場合:"
+    echo "     cd vscode-extension && npm install && npm run compile"
+    echo "     vsce package --allow-missing-repository"
+    echo "     code --install-extension claude-voice-notify-panel-1.0.0.vsix"
+  else
+    echo "  ⏭️  vscode-extension ディレクトリが見つかりません（スキップ）"
+  fi
+fi
+
+# ============================================
+# STEP 6: キャラクター選択（VOICEVOX時のみ）
 # ============================================
 if [ "$SELECTED_PROVIDER" = "voicevox" ] && [ "$VOICEVOX_RUNNING" = true ]; then
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "  STEP 5: キャラクターを選ぶ 🎤"
+  echo "  STEP 6: キャラクターを選ぶ 🎤"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
   echo "  まず、どんな声がいいか教えてください。"
@@ -477,11 +555,11 @@ print()
 fi
 
 # ============================================
-# STEP 6: Claude Code 設定ガイド
+# STEP 7: Claude Code 設定ガイド
 # ============================================
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  STEP 6: Claude Code との連携"
+echo "  STEP 7: Claude Code との連携"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
@@ -528,6 +606,15 @@ echo "  ./notify.sh off                → 音声OFF（会議中に便利）"
 echo "  ./notify.sh on                 → 音声ON"
 echo "  ./notify.sh set-provider google→ Google TTSに切り替え"
 echo "  ────────────────────────────────────────────"
+if [ "$VSCODE_EXT_INSTALLED" = true ]; then
+  echo ""
+  echo "  VS Code 拡張機能:"
+  echo "  ────────────────────────────────────────────"
+  echo "  ステータスバー 🔊 Voice ON    → クリックで ON/OFF"
+  echo "  ステータスバー ⚙️ VB設定      → 設定パネルを開く"
+  echo "  Cmd+Shift+P → Claude Voice   → 全コマンド表示"
+  echo "  ────────────────────────────────────────────"
+fi
 echo ""
 echo "  お楽しみください！ 🎉"
 echo ""
