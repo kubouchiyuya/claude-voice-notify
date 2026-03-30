@@ -1,7 +1,7 @@
 import type { TTSProvider, SpeakOptions } from '../types.js';
 
 const DEFAULT_BASE_URL = 'http://localhost:50021';
-const DEFAULT_SPEAKER = 1; // ずんだもん（ノーマル）
+const DEFAULT_SPEAKER = 3; // ずんだもん（あまあま）
 
 // ずんだもん Speaker ID一覧
 // 0: 四国めたん（あまあま）  1: ずんだもん（ノーマル）
