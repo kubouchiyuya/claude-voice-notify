@@ -1,19 +1,58 @@
 # claude-voice-notify
 
+## 音声通知コマンド
+
+```bash
+/Users/kubouchiyuya/Projects/claude-voice-notify/notify.sh "メッセージ" [type] [speaker_id] [speed]
+```
+
+- type: complete / confirm / error / explain
+- speaker_id: 1=ずんだもん(デフォルト), 3=ずんだもん(あまあま), 8=春日部つむぎ 等
+- speed: 読み上げ速度 (デフォルト1.0)
+
 ## 音声通知ルール
 
-このプロジェクトでは `voice-notify` MCPサーバーによる音声通知が有効です。
+### タスク完了時 — 具体的に何をしたか説明する
 
-### 必ず守ること
+```bash
+notify.sh "ログイン機能の実装が完了しました。JWT認証を使っています"  # 良い
+notify.sh "タスクが完了しました"  # ← 禁止。汎用メッセージは使わない
+```
 
-1. **タスク完了時** → `mcp__voice-notify__notify_complete` を呼ぶ
-2. **ユーザーへの確認が必要な時** → `mcp__voice-notify__notify_confirm` を呼ぶ
-3. **エラー発生時** → `mcp__voice-notify__notify_speak` で type="error" を指定して呼ぶ
+### 確認・質問時 — 何を確認したいか明確に
 
-### プロバイダー
+```bash
+notify.sh "確認です。データベースのテーブルを削除してよいですか？" confirm
+```
 
-- デフォルト: VOICEVOX（ずんだもん / Speaker ID: 1）
-- VOICEVOX が `http://localhost:50021` で起動している必要がある
+### エラー時 — 原因と対処を説明
+
+```bash
+notify.sh "ビルドエラーです。型エラーが3件あります" error
+```
+
+### 解説モード — 初心者に分かりやすく技術を説明
+
+作業の前後に音声を入れて「何をやるか → やった結果」の流れにする。
+技術用語はかみ砕いて説明する。
+
+```bash
+notify.sh "これからAPIルートを作ります。これはフロントとバックエンドの通信窓口です" explain
+# ... 作業 ...
+notify.sh "APIルートができました。ユーザーがボタンを押すとここにリクエストが飛びます" explain
+```
+
+### 作ったものの説明 — それが何で、何をするものか
+
+```bash
+notify.sh "今作ったのはユーザー認証のAPIです。ログインする人が本人かどうかを確認する仕組みです"
+```
+
+## 重要
+
+- 長いメッセージは40文字程度で分割して複数回呼ぶ
+- 読み上げテキストは話し言葉にする
+- 「静かにして」「音声オフ」と言われたら停止
 
 <claude-mem-context>
 # Recent Activity
