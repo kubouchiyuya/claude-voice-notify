@@ -1,0 +1,37 @@
+{
+  "name": "claude-voice-notify",
+  "version": "1.0.0",
+  "description": "Multi-provider voice notification MCP server for Claude Code - Default: VOICEVOX (Zundamon)",
+  "main": "dist/index.js",
+  "bin": {
+    "claude-voice-notify": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "setup": "node dist/setup.js"
+  },
+  "keywords": [
+    "mcp",
+    "claude-code",
+    "voicevox",
+    "tts",
+    "zundamon",
+    "voice-notification",
+    "ai-tools",
+    "japanese-tts"
+  ],
+  "author": "Masa_AIcreater",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
