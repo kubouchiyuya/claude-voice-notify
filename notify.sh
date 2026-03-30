@@ -76,14 +76,8 @@ print(json.dumps(q))
   fi
 }
 
-# --- macOS say フォールバック ---
-try_macos_say() {
-  if command -v say > /dev/null 2>&1; then
-    say -v "$SAY_VOICE" "$MESSAGE"
-    return 0
-  fi
-  return 1
-}
-
 # --- メイン ---
-try_voicevox || try_macos_say || echo "[claude-voice-notify] 音声再生に失敗しました" >&2
+if ! try_voicevox; then
+  echo "[claude-voice-notify] VOICEVOXに接続できません。VOICEVOXが起動しているか確認してください (http://localhost:50021)" >&2
+  exit 1
+fi
