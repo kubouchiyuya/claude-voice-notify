@@ -30,19 +30,32 @@ Claude Code がタスク完了・確認要求・エラー発生時に**音声で
 
 ### 方法 A: ワンコマンドセットアップ（推奨）
 
+**macOS / Linux:**
+
 ```bash
 git clone https://github.com/kubouchiyuya/claude-voice-notify.git
 cd claude-voice-notify
 ./setup.sh
 ```
 
+**Windows:**
+
+```cmd
+git clone https://github.com/kubouchiyuya/claude-voice-notify.git
+cd claude-voice-notify
+setup.bat
+```
+
 セットアップスクリプトが以下を自動で行います：
-- VOICEVOX の検出・インストール案内（Homebrew or 公式サイト）
+- VOICEVOX の検出・自動インストール（macOS: GitHub Releases / Windows: winget）
 - `npm install` & `npm run build`
 - Claude Code Hooks の設定ガイド
 - 音声テスト
 
-**VOICEVOX がなくても動きます** — macOS の `say` コマンド（Kyoko）に自動フォールバックします。
+**VOICEVOX がなくても動きます：**
+- macOS → `say` コマンド（Kyoko）に自動フォールバック
+- Windows → Windows SAPI（日本語音声）に自動フォールバック
+
 後から VOICEVOX をインストール・起動すれば、自動的にずんだもんの声に切り替わります。
 
 ### 方法 B: 手動セットアップ
@@ -58,19 +71,28 @@ npm run build
 
 #### 2. VOICEVOX をインストール（任意）
 
+**macOS:**
 ```bash
-# Homebrew
-brew install --cask voicevox
+# 公式サイトからダウンロード
+open https://voicevox.hiroshiba.jp/
+```
+
+**Windows:**
+```cmd
+# winget でインストール
+winget install Hiroshiba.VOICEVOX
 
 # または公式サイトからダウンロード
 # https://voicevox.hiroshiba.jp/
 ```
 
-インストールしなくても macOS `say`（Kyoko）で動作します。
+インストールしなくても macOS `say` / Windows SAPI で動作します。
 
 ### 3. Claude Code Hooks を設定（再起動不要）
 
 `~/.claude/settings.json` の `hooks` に追加：
+
+**macOS / Linux:**
 
 ```json
 {
@@ -93,6 +115,37 @@ brew install --cask voicevox
           {
             "type": "command",
             "command": "/path/to/claude-voice-notify/notify.sh '確認をお願いします' confirm"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Windows:**
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File C:\\path\\to\\claude-voice-notify\\notify.ps1 'タスクが完了しました' complete"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File C:\\path\\to\\claude-voice-notify\\notify.ps1 '確認をお願いします' confirm"
           }
         ]
       }

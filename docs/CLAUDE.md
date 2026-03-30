@@ -7,5 +7,6 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #8109 | 2:56 PM | 🟣 | Hooks-based notification system with automated setup installer shipped to GitHub | ~405 |
 | #8100 | 1:32 PM | 🟣 | Initial repository commit for multi-provider voice notification MCP server | ~393 |
 </claude-mem-context>

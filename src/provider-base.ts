@@ -18,20 +18,35 @@ export async function playAudio(audioBuffer: Buffer, volume: number = 1.0): Prom
         cmd = 'afplay';
         args = ['-v', String(volume), tmpPath];
       } else if (os === 'win32') {
+        // Windows: PowerShell の Media.SoundPlayer で再生
+        // パスのエスケープを考慮して変数展開を使用
         cmd = 'powershell';
         args = [
+          '-NoProfile',
+          '-ExecutionPolicy', 'Bypass',
           '-Command',
-          `(New-Object Media.SoundPlayer '${tmpPath}').PlaySync()`,
+          `Add-Type -AssemblyName presentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open([Uri]'${tmpPath.replace(/'/g, "''")}'); $p.Volume = ${volume}; $p.Play(); Start-Sleep -Milliseconds 100; while ($p.Position -lt $p.NaturalDuration.TimeSpan) { Start-Sleep -Milliseconds 100 }; $p.Close()`,
         ];
       } else {
-        // Linux: try aplay, then paplay
+        // Linux: aplay (ALSA), paplay (PulseAudio), or play (SoX) in fallback order
         cmd = 'aplay';
-        args = [tmpPath];
+        args = ['-q', tmpPath];
       }
 
       execFile(cmd, args, (error) => {
-        if (error) reject(error);
-        else resolve();
+        if (error) {
+          // Linux fallback: try paplay
+          if (os === 'linux') {
+            execFile('paplay', [tmpPath], (err2) => {
+              if (err2) reject(error);
+              else resolve();
+            });
+          } else {
+            reject(error);
+          }
+        } else {
+          resolve();
+        }
       });
     });
   } finally {

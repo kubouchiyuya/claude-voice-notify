@@ -46,7 +46,7 @@ if [ "$VOICEVOX_INSTALLED" = false ]; then
   echo "   ⚠️  VOICEVOX が見つかりません"
   echo ""
   echo "   VOICEVOXをインストールしますか？"
-  echo "   1) Homebrew でインストール (推奨)"
+  echo "   1) 自動ダウンロード＆インストール (推奨)"
   echo "   2) 公式サイトからダウンロード"
   echo "   3) スキップ (macOS say で代替)"
   echo ""
@@ -54,13 +54,32 @@ if [ "$VOICEVOX_INSTALLED" = false ]; then
 
   case "$choice" in
     1)
-      if command -v brew > /dev/null 2>&1; then
-        echo "   📦 Homebrew で VOICEVOX をインストール中..."
-        brew install --cask voicevox
-        VOICEVOX_INSTALLED=true
-        echo "   ✅ インストール完了"
+      echo "   📦 VOICEVOX を GitHub Releases からダウンロード中..."
+      # アーキテクチャ判定
+      ARCH=$(uname -m)
+      if [ "$ARCH" = "arm64" ]; then
+        ZIP_NAME="voicevox-macos-cpu-arm64"
       else
-        echo "   ❌ Homebrew が見つかりません"
+        ZIP_NAME="voicevox-macos-cpu-x64"
+      fi
+      # 最新バージョン取得
+      LATEST_TAG=$(curl -sL "https://api.github.com/repos/VOICEVOX/voicevox/releases/latest" | python3 -c "import json,sys; print(json.load(sys.stdin)['tag_name'])" 2>/dev/null)
+      if [ -z "$LATEST_TAG" ]; then
+        LATEST_TAG="0.25.1"
+      fi
+      DL_URL="https://github.com/VOICEVOX/voicevox/releases/download/${LATEST_TAG}/${ZIP_NAME}-${LATEST_TAG}.zip"
+      echo "   URL: $DL_URL"
+      echo "   (約1.8GB - 数分かかります)"
+      curl -L -o /tmp/voicevox-macos.zip "$DL_URL"
+      if [ $? -eq 0 ]; then
+        echo "   📂 展開中..."
+        unzip -o -q /tmp/voicevox-macos.zip -d /tmp/voicevox-extract
+        cp -R /tmp/voicevox-extract/VOICEVOX/VOICEVOX.app /Applications/
+        rm -rf /tmp/voicevox-macos.zip /tmp/voicevox-extract
+        VOICEVOX_INSTALLED=true
+        echo "   ✅ /Applications/VOICEVOX.app にインストール完了"
+      else
+        echo "   ❌ ダウンロードに失敗しました"
         echo "   公式サイトからダウンロードしてください: https://voicevox.hiroshiba.jp/"
       fi
       ;;
