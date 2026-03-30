@@ -15,12 +15,38 @@
 #   7: ずんだもん(ささやき)    8: 春日部つむぎ          9: 雨晴はう
 #  10: 波音リツ              11: 玄野武宏             14: 冥鳴ひまり
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+STATE_FILE="$SCRIPT_DIR/.voice-enabled"
+
+# --- 音声のオン/オフ制御 ---
+# "on" / "off" / "status" コマンド
+if [ "$1" = "on" ]; then
+  echo "1" > "$STATE_FILE"
+  echo "[claude-voice-notify] 音声通知: ON"
+  exit 0
+elif [ "$1" = "off" ]; then
+  echo "0" > "$STATE_FILE"
+  echo "[claude-voice-notify] 音声通知: OFF"
+  exit 0
+elif [ "$1" = "status" ]; then
+  if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "0" ]; then
+    echo "[claude-voice-notify] 音声通知: OFF"
+  else
+    echo "[claude-voice-notify] 音声通知: ON"
+  fi
+  exit 0
+fi
+
+# 音声が無効なら即終了
+if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "0" ]; then
+  exit 0
+fi
+
 MESSAGE="${1:-}"
 TYPE="${2:-complete}"
 VOICEVOX_SPEAKER="${3:-${VOICEVOX_SPEAKER:-1}}"
 SPEED="${4:-1.0}"
 VOICEVOX_URL="${VOICEVOX_URL:-http://localhost:50021}"
-SAY_VOICE="${SAY_VOICE:-Kyoko}"
 
 # タイプ別デフォルトメッセージ（第1引数が空の場合のみ）
 if [ -z "$MESSAGE" ]; then
