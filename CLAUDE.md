@@ -22,7 +22,14 @@ $NOTIFY set-google-voice ja-JP-Neural2-B      # Google音声名変更
 
 # オン/オフ
 $NOTIFY on / off / status
+
+# 設定パネル（キャラ・速度・方言・エンジン）
+/Users/kubouchiyuya/Projects/claude-voice-notify/settings.sh
 ```
+
+### VS Code からの設定アクセス
+- `Cmd+Shift+P` → 「Tasks: Run Task」→「⚙️ VB設定パネル」
+- または `settings.sh` を直接実行
 
 ## 絶対に音声で通知する場面（必須・スキップ不可）
 

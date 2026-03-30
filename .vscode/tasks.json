@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "⚙️ VB設定パネル",
+      "type": "shell",
+      "command": "${workspaceFolder}/settings.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "🔊 音声ON",
+      "type": "shell",
+      "command": "${workspaceFolder}/notify.sh on",
+      "presentation": { "reveal": "silent" },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔇 音声OFF",
+      "type": "shell",
+      "command": "${workspaceFolder}/notify.sh off",
+      "presentation": { "reveal": "silent" },
+      "problemMatcher": []
+    },
+    {
+      "label": "🔊 テスト再生",
+      "type": "shell",
+      "command": "${workspaceFolder}/notify.sh 'テスト再生です' complete",
+      "presentation": { "reveal": "silent" },
+      "problemMatcher": []
+    }
+  ]
+}
