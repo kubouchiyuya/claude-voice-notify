@@ -5,3 +5,6 @@ dist/
 .DS_Store
 .voice-enabled
 .voice-config
+
+# Star gate cache (per-user auth)
+.star-verified
