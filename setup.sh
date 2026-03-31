@@ -18,6 +18,27 @@ echo "  ║   claude-voice-notify セットアップウィザード    ║"
 echo "  ║   Claude Code が声で報告するようになります     ║"
 echo "  ╚══════════════════════════════════════════════╝"
 echo ""
+echo "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  ようこそ！クローンしてくださってありがとうございます。"
+echo "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "  このツールをダウンロード（クローン）してくださって"
+echo "  ありがとうございます！"
+echo "  もし便利だと思ったら、ぜひ GitHub でスターを押してください。"
+echo "  あなたのスターが開発の励みになります！"
+echo ""
+echo "  このツールには、エンジニア以外の方向けに、"
+echo "  専門用語をわかりやすく説明する機能が入っています。"
+echo "  必要なければ、いつでもオフにできますので、"
+echo "  まずはそのままお使いください。"
+echo ""
+echo "  ★ VS Code 拡張機能について:"
+echo "    このリポジトリには VS Code 拡張機能が含まれています。"
+echo "    セットアップが完了すると、VS Code からも音声を"
+echo "    ON/OFF できるようになります。"
+echo "    オンライン会議中は設定パネル（./settings.sh）から"
+echo "    「音声 OFF」に設定できます。"
+echo ""
 
 # ============================================
 # STEP 0: ⭐ Star ゲート
@@ -552,6 +573,26 @@ print()
     fi
   fi
   echo "  ✅ キャラクター設定完了！"
+fi
+
+# ============================================
+# STEP 6.5: デフォルト設定の書き込み
+# ============================================
+if [ ! -f "$CONFIG_FILE" ]; then
+  touch "$CONFIG_FILE"
+  chmod 600 "$CONFIG_FILE"
+fi
+# VOICE_LANG がなければ追加
+if ! grep -q "^VOICE_LANG=" "$CONFIG_FILE" 2>/dev/null; then
+  echo "VOICE_LANG=ja" >> "$CONFIG_FILE"
+fi
+# TERM_EXPLAIN がなければ追加
+if ! grep -q "^TERM_EXPLAIN=" "$CONFIG_FILE" 2>/dev/null; then
+  echo "TERM_EXPLAIN=on" >> "$CONFIG_FILE"
+fi
+# VOICE_ENABLED がなければ追加
+if ! grep -q "^VOICE_ENABLED=" "$CONFIG_FILE" 2>/dev/null; then
+  echo "VOICE_ENABLED=on" >> "$CONFIG_FILE"
 fi
 
 # ============================================

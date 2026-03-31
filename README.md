@@ -1,5 +1,13 @@
 # claude-voice-notify
 
+> ⭐ **クローン（ダウンロード）してくれた方へ**: このツールが役立ったら、ぜひ上の「Star」ボタンを押してください！あなたのスターが開発の励みになります！
+
+> 💡 **エンジニア以外の方へ**: このツールは専門知識がなくても使えるよう設計されています。
+> 初回セットアップ時に音声で使い方を案内します。用語がわからない場合は「用語説明モード」（デフォルトON）が自動的に説明します。
+
+> 🎙️ **VS Code拡張機能について**: このリポジトリにはVS Code拡張機能が含まれています。
+> セットアップするだけで自動的に使えるようになります。オンライン会議中は設定パネル（`./settings.sh`）から音声をOFFにできます。
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io/)
